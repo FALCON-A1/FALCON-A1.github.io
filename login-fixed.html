@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpharia - Sign In</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .auth-card {
+            padding: 2rem;
+        }
+        
+        .auth-card-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-card-header h2 {
+            color: #111827;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-card-header p {
+            color: #6b7280;
+            font-size: 0.9375rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+        
+        .form-label {
+            display: block;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .forgot-password {
+            color: #4f46e5;
+            font-size: 0.75rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.2);
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-outline {
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            margin: 1.5rem 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        
+        .divider span {
+            padding: 0 1rem;
+        }
+        
+        .social-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .social-btn:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .social-btn img {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .auth-footer a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Error message */
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .form-group.error .form-input {
+            border-color: #ef4444;
+        }
+        
+        /* Success message */
+        .success-message {
+            background-color: #ecfdf5;
+            color: #065f46;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            font-size: 0.875rem;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        .loading-text {
+            color: #4b5563;
+            font-weight: 500;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Signing in...</div>
+    </div>
+    
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Header -->
+            <div class="auth-card-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to continue to Alpharia</p>
+            </div>
+            
+            <!-- Error Message -->
+            <div id="error-message" class="error-message"></div>
+            
+            <!-- Success Message -->
+            <div id="success-message" class="success-message">
+                <i class="fas fa-check-circle"></i> Sign in successful! Redirecting...
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form">
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+                    </div>
+                    <div id="email-error" class="error-message"></div>
+                </div>
+                
+                <!-- Password -->
+                <div class="form-group">
+                    <div class="form-label-row">
+                        <label for="password" class="form-label">Password</label>
+                        <a href="forgot-password.html" class="forgot-password">Forgot password?</a>
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" class="form-input" placeholder="Enter your password" required minlength="6">
+                        <button type="button" class="toggle-password" data-target="password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="password-error" class="error-message"></div>
+                </div>
+                
+                <!-- Remember Me -->
+                <div class="form-group" style="margin-top: -0.5rem;">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="remember-me">
+                        <span class="checkmark"></span>
+                        <span>Remember me</span>
+                    </label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn" id="login-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+                
+                <!-- Divider -->
+                <div class="divider">
+                    <span>Or continue with</span>
+                </div>
+                
+                <!-- Social Buttons -->
+                <div class="social-buttons">
+                    <button type="button" class="social-btn" id="google-login">
+                        <img src="https://www.google.com/favicon.ico" alt="Google">
+                        Google
+                    </button>
+                    <button type="button" class="social-btn" id="microsoft-login">
+                        <img src="https://www.microsoft.com/favicon.ico" alt="Microsoft">
+                        Microsoft
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Footer -->
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="signup-fixed.html">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            GoogleAuthProvider, 
+            signInWithPopup,
+            onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc 
+        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtOedXLBC4eigzqmBpYFciN-W5Mi2Cpmc",
+            authDomain: "alpharia-c6a39.firebaseapp.com",
+            projectId: "alpharia-c6a39",
+            storageBucket: "alpharia-c6a39.firebasestorage.app",
+            messagingSenderId: "85322759772",
+            appId: "1:85322759772:web:d5c7a528fd61c9d2373099",
+            measurementId: "G-KEC7MGMVE8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // DOM Elements
+        const loginForm = document.getElementById('login-form');
+        const googleLoginButton = document.getElementById('google-login');
+        const microsoftLoginButton = document.getElementById('microsoft-login');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+
+        // Show loading overlay
+        function showLoading() {
+            loadingOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Hide loading overlay
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Show error message
+        function showError(inputId, message) {
+            const input = document.getElementById(inputId);
+            const errorElement = document.getElementById(`${inputId}-error`);
+            
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+            
+            if (input) {
+                input.classList.add('error');
+            }
+            
+            // Also show in the main error message area
+            if (message && errorMessage) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                
+                // Hide success message if it's visible
+                if (successMessage) {
+                    successMessage.style.display = 'none';
+                }
+            }
+        }
+        
+        // Clear error message
+        function clearError(inputId) {
+            const input = document.getElementById(inputId);
+            const errorElement = document.getElementById(`${inputId}-error`);
+            
+            if (errorElement) {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+            
+            if (input) {
+                input.classList.remove('error');
+            }
+        }
+        
+        // Toggle password visibility
+        function setupPasswordToggle(button) {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+        
+        // Validate email format
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(String(email).toLowerCase());
+        }
+        
+        // Handle form submission
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+            
+            // Validate form
+            let isValid = true;
+            
+            // Validate email
+            if (!email) {
+                showError('email', 'Email is required');
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                showError('email', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                clearError('email');
+            }
+            
+            // Validate password
+            if (!password) {
+                showError('password', 'Password is required');
+                isValid = false;
+            } else if (password.length < 6) {
+                showError('password', 'Password must be at least 6 characters');
+                isValid = false;
+            } else {
+                clearError('password');
+            }
+            
+            if (!isValid) return;
+            
+            try {
+                showLoading();
+                
+                // Sign in with email and password
+                console.log('Attempting to sign in with email:', email);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password)
+                    .catch(error => {
+                        console.error('Sign in error:', {
+                            code: error.code,
+                            message: error.message,
+                            email: email
+                        });
+                        throw error;
+                    });
+                const user = userCredential.user;
+                console.log('User signed in successfully:', user.uid);
+                
+                // Check if email is verified
+                if (!user.emailVerified) {
+                    // Optionally, you can send a verification email here
+                    // await sendEmailVerification(user);
+                    // showError(null, 'Please verify your email address. A verification link has been sent to your email.');
+                }
+                
+                // Get user data from Firestore to determine user type
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (!userDoc.exists()) {
+                    console.error('No user document found for UID:', user.uid);
+                    throw new Error('User account not properly set up. Please contact support.');
+                }
+                const userData = userDoc.data();
+                console.log('User data:', userData);
+                
+                // Show success message
+                if (successMessage) {
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                }
+                
+                // Redirect based on user type after a short delay
+                setTimeout(() => {
+                    if (userData && userData.userType === 'teacher') {
+                        window.location.href = '../teacher-dashboard.html';
+                    } else {
+                        window.location.href = '../student-dashboard-clean.html';
+                    }
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                // Handle different error cases
+                let errorMessage = 'An error occurred during login. Please try again.';
+                
+                switch(error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email address.';
+                        showError('email', errorMessage);
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password. Please try again.';
+                        showError('password', errorMessage);
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        showError('email', errorMessage);
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed login attempts. Please try again later or reset your password.';
+                        showError(null, errorMessage);
+                        break;
+                    default:
+                        showError(null, errorMessage);
+                }
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Handle Google login
+        async function handleGoogleLogin() {
+            try {
+                showLoading();
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                
+                // Check if this is a new user
+                const isNewUser = result._tokenResponse.isNewUser;
+                
+                if (isNewUser) {
+                    // Create user profile in Firestore
+                    const userData = {
+                        uid: user.uid,
+                        name: user.displayName || 'User',
+                        email: user.email,
+                        userType: 'student', // Default to student for Google login
+                        photoURL: user.photoURL,
+                        emailVerified: user.emailVerified,
+                        createdAt: new Date().toISOString(),
+                        points: 0,
+                        level: 1
+                    };
+                    
+                    // Create user document
+                    await setDoc(doc(db, 'users', user.uid), userData);
+                    
+                    // Create student document by default
+                    await setDoc(doc(db, 'students', user.uid), userData);
+                    
+                    // Redirect to student dashboard
+                    window.location.href = '../student-dashboard-clean.html';
+                } else {
+                    // User exists, redirect to appropriate dashboard
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    const userData = userDoc.data();
+                    
+                    if (userData && userData.userType === 'teacher') {
+                        window.location.href = '../teacher-dashboard.html';
+                    } else {
+                        window.location.href = '../student-dashboard-clean.html';
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Google login error:', error);
+                showError(null, 'An error occurred during Google login. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Handle Microsoft login (placeholder)
+        function handleMicrosoftLogin() {
+            showError(null, 'Microsoft login will be implemented soon. Please use email or Google to sign in.');
+        }
+        
+        // Check if user is already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, redirect to dashboard
+                getDoc(doc(db, 'users', user.uid)).then((doc) => {
+                    const userData = doc.data();
+                    if (userData && userData.userType === 'teacher') {
+                        window.location.href = '../teacher-dashboard.html';
+                    } else {
+                        window.location.href = '../student-dashboard-clean.html';
+                    }
+                });
+            }
+        });
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up password toggles
+            document.querySelectorAll('.toggle-password').forEach(setupPasswordToggle);
+            
+            // Form submission
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Google login
+            if (googleLoginButton) {
+                googleLoginButton.addEventListener('click', handleGoogleLogin);
+            }
+            
+            // Microsoft login
+            if (microsoftLoginButton) {
+                microsoftLoginButton.addEventListener('click', handleMicrosoftLogin);
+            }
+            
+            // Clear error when typing in inputs
+            document.getElementById('email').addEventListener('input', () => {
+                clearError('email');
+                errorMessage.style.display = 'none';
+            });
+            
+            document.getElementById('password').addEventListener('input', () => {
+                clearError('password');
+                errorMessage.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
