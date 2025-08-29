@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Progress - Alpharia Teacher</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="css/teacher-dashboard.css" rel="stylesheet">
+    <link href="css/teacher-styles.css" rel="stylesheet">
+</head>
+<body class="dashboard-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Alpharia</h3>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="teacher-dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="create-test.html" class="nav-link">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Create Test</span>
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a href="teacher-progress.html" class="nav-link active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Progress</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="teacher-settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <nav class="top-bar">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="user-profile">
+                <span class="username">Teacher Name</span>
+                <div class="avatar">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="container-fluid py-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Class Progress</h2>
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-filter me-2"></i>Filter by Class
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">All Classes</a></li>
+                        <li><a class="dropdown-item" href="#">English 101</a></li>
+                        <li><a class="dropdown-item" href="#">Advanced Pronunciation</a></li>
+                        <li><a class="dropdown-item" href="#">Conversation Practice</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted">Total Students</h6>
+                                    <h3 class="mb-0">42</h3>
+                                </div>
+                                <div class="stat-icon bg-primary-light">
+                                    <i class="fas fa-users text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted">Average Score</h6>
+                                    <h3 class="mb-0">84%</h3>
+                                </div>
+                                <div class="stat-icon bg-success-light">
+                                    <i class="fas fa-chart-line text-success"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-success"><i class="fas fa-arrow-up"></i> 2% from last month</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted">Assignments Graded</h6>
+                                    <h3 class="mb-0">128</h3>
+                                </div>
+                                <div class="stat-icon bg-warning-light">
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">12 pending review</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted">Class Average</h6>
+                                    <h3 class="mb-0">B+</h3>
+                                </div>
+                                <div class="stat-icon bg-info-light">
+                                    <i class="fas fa-award text-info"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-success">On track</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Charts -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Class Performance</h5>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary">Tests</button>
+                                <button class="btn btn-sm btn-outline-secondary active">Assignments</button>
+                                <button class="btn btn-sm btn-outline-secondary">Participation</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 300px;">
+                                <!-- Chart will be rendered here -->
+                                <canvas id="classPerformanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Score Distribution</h5>
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 300px;">
+                                <!-- Chart will be rendered here -->
+                                <canvas id="scoreDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Progress Table -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Student Progress</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-download me-1"></i> Export
+                        </button>
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus me-1"></i> Add Student
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Last Active</th>
+                                    <th>Average Score</th>
+                                    <th>Completed Tests</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-3">
+                                                <span class="avatar-title bg-primary rounded-circle">JD</span>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">John Doe</h6>
+                                                <small class="text-muted">john.doe@example.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>2 hours ago</td>
+                                    <td>92%</td>
+                                    <td>8/10</td>
+                                    <td>
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 80%" 
+                                                aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">View</button>
+                                    </td>
+                                </tr>
+                                <!-- More student rows would go here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="js/teacher.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts
+            const classCtx = document.getElementById('classPerformanceChart').getContext('2d');
+            const classChart = new Chart(classCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Class Average',
+                        data: [72, 75, 78, 80, 82, 84],
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const distCtx = document.getElementById('scoreDistributionChart').getContext('2d');
+            const distChart = new Chart(distCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['90-100%', '80-89%', '70-79%', '60-69%', 'Below 60%'],
+                    datasets: [{
+                        data: [12, 18, 7, 3, 2],
+                        backgroundColor: ['#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'],
+                        hoverBackgroundColor: ['#17a673', '#2c9faf', '#dda20a', '#be2617', '#6c757d'],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '70%',
+                },
+            });
+
+            // Load user data
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    document.querySelector('.username').textContent = user.displayName || 'Teacher';
+                    // Load class data from Firestore
+                    // This is a placeholder - implement actual data loading
+                } else {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

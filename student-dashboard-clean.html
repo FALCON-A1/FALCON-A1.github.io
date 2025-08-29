@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Alpharia</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/student-dashboard-clean.css">
+</head>
+<body class="student-dashboard">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Alpharia</h2>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="student-dashboard-clean.html" class="nav-link active">
+                            <i class="fas fa-home"></i>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="take-test.html" class="nav-link">
+                            <i class="fas fa-tasks"></i>
+                            <span>My Tests</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="student-progress.html" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Progress</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-book"></i>
+                            <span>Resources</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="student-settings.html" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search tests, resources...">
+                </div>
+                
+                <div class="user-menu">
+                    <a href="#notifications" class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </a>
+                    
+                    <div class="user-avatar">
+                            <img src="" 
+                                 alt="User" 
+                                 class="rounded-circle"
+                                 width="40"
+                                 height="40"
+                                 id="user-avatar">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Welcome Section -->
+                <section class="welcome-section">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1>Welcome back, <span class="text-primary" id="user-name">Student</span>!</h1>
+                            <button id="sign-out-btn" class="btn btn-sm btn-outline-secondary mt-2">
+                                <i class="fas fa-sign-out-alt"></i> Sign Out
+                            </button>
+                            <p class="lead">You have <strong id="upcoming-tests-count">0 upcoming tests</strong>. Stay on track with your studies!</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>12</h3>
+                            <p>Completed Tests</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>87%</h3>
+                            <p>Average Score</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>3</h3>
+                            <p>Upcoming Tests</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <section class="recent-activity">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                            <a href="#view-all" class="btn btn-link">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <h4>PRE-TEST</h4>
+                                    <p class="text-muted">Scored 92% - Great job!</p>
+                                    <small>2 hours ago</small>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <h4>New Resource Added</h4>
+                                    <p class="text-muted">Chapter 5 Study Guide</p>
+                                    <small>1 day ago</small>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <h4>New Assignment</h4>
+                                    <p class="text-muted">English Essay - Due in 3 days</p>
+                                    <small>2 days ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            signOut 
+        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc,
+            collection,
+            query,
+            where,
+            getDocs,
+            orderBy,
+            limit
+        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtOedXLBC4eigzqmBpYFciN-W5Mi2Cpmc",
+            authDomain: "alpharia-c6a39.firebaseapp.com",
+            projectId: "alpharia-c6a39",
+            storageBucket: "alpharia-c6a39.firebasestorage.app",
+            messagingSenderId: "85322759772",
+            appId: "1:85322759772:web:d5c7a528fd61c9d2373099",
+            measurementId: "G-KEC7MGMVE8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const userNameElement = document.querySelector('.welcome-section h1 .text-primary');
+        const userAvatar = document.querySelector('.user-avatar img');
+        const upcomingTestsCount = document.querySelector('.welcome-section .lead strong');
+        const completedTestsElement = document.querySelector('.stat-card:nth-child(1) .stat-value');
+        const averageScoreElement = document.querySelector('.stat-card:nth-child(2) .stat-value');
+        const streakCountElement = document.querySelector('.stat-card:nth-child(3) .stat-value');
+        const recentActivityList = document.querySelector('.recent-activity .activity-list');
+        const upcomingTestsList = document.querySelector('.upcoming-tests .test-list');
+        const progressBars = document.querySelectorAll('.progress-bar');
+        const signOutBtn = document.getElementById('sign-out-btn');
+
+        // Format date
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Load user data
+        async function loadUserData(user) {
+            try {
+                // Get user document from Firestore
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const studentDoc = await getDoc(doc(db, 'students', user.uid));
+                
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    
+                    // Update user info
+                    if (userNameElement) {
+                        userNameElement.textContent = userData.name || 'Student';
+                    }
+                    
+                    // Update avatar with user's first letter if no photo
+                    if (userAvatar) {
+                        userAvatar.alt = userData.name || 'User';
+                        if (!user.photoURL) {
+                            const name = userData.name || 'S';
+                            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+                            userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=4361ee&color=fff`;
+                        } else {
+                            userAvatar.src = user.photoURL;
+                        }
+                    }
+                }
+                
+                if (studentDoc.exists()) {
+                    const studentData = studentDoc.data();
+                    
+                    // Update stats
+                    if (completedTestsElement) {
+                        completedTestsElement.textContent = studentData.testsCompleted || 0;
+                    }
+                    
+                    if (averageScoreElement) {
+                        averageScoreElement.textContent = studentData.averageScore ? `${studentData.averageScore}%` : 'N/A';
+                    }
+                    
+                    if (streakCountElement) {
+                        streakCountElement.textContent = studentData.streakDays || 0;
+                    }
+                    
+                    // Update progress bars
+                    if (studentData.skills) {
+                        progressBars.forEach(bar => {
+                            const skillName = bar.getAttribute('data-skill');
+                            const skill = studentData.skills[skillName];
+                            if (skill) {
+                                const percentage = Math.min(100, Math.max(0, skill.level * 20));
+                                bar.style.width = `${percentage}%`;
+                                bar.setAttribute('aria-valuenow', percentage);
+                                bar.textContent = `${percentage}%`;
+                            }
+                        });
+                    }
+                }
+                
+                // Load upcoming tests
+                await loadUpcomingTests(user.uid);
+                
+                // Load recent activity
+                await loadRecentActivity(user.uid);
+                
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        // Load upcoming tests
+        async function loadUpcomingTests(userId) {
+            try {
+                const now = new Date();
+                const testsRef = collection(db, 'tests');
+                const q = query(
+                    testsRef,
+                    where('assignedTo', 'array-contains', userId),
+                    where('dueDate', '>=', now),
+                    orderBy('dueDate', 'asc'),
+                    limit(3)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const upcomingTests = [];
+                
+                querySnapshot.forEach((doc) => {
+                    upcomingTests.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Update UI
+                if (upcomingTestsCount) {
+                    upcomingTestsCount.textContent = upcomingTests.length;
+                }
+                
+                if (upcomingTestsList) {
+                    upcomingTestsList.innerHTML = '';
+                    
+                    if (upcomingTests.length === 0) {
+                        upcomingTestsList.innerHTML = '<div class="no-tests">No upcoming tests</div>';
+                        return;
+                    }
+                    
+                    upcomingTests.forEach(test => {
+                        const testElement = document.createElement('div');
+                        testElement.className = 'test-item';
+                        testElement.innerHTML = `
+                            <div class="test-info">
+                                <h4>${test.title}</h4>
+                                <p><i class="far fa-calendar-alt"></i> Due: ${formatDate(test.dueDate?.toDate())}</p>
+                            </div>
+                            <a href="take-test.html?testId=${test.id}" class="btn btn-sm btn-primary">Start</a>
+                        `;
+                        upcomingTestsList.appendChild(testElement);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading upcoming tests:', error);
+            }
+        }
+        
+        // Load recent activity
+        async function loadRecentActivity(userId) {
+            try {
+                const activitiesRef = collection(db, 'activities');
+                const q = query(
+                    activitiesRef,
+                    where('userId', '==', userId),
+                    orderBy('timestamp', 'desc'),
+                    limit(5)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                
+                if (recentActivityList) {
+                    recentActivityList.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        recentActivityList.innerHTML = '<div class="no-activity">No recent activity</div>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach(doc => {
+                        const activity = doc.data();
+                        const activityElement = document.createElement('div');
+                        activityElement.className = 'activity-item';
+                        activityElement.innerHTML = `
+                            <div class="activity-icon">
+                                <i class="fas ${getActivityIcon(activity.type)}"></i>
+                            </div>
+                            <div class="activity-details">
+                                <p>${activity.description}</p>
+                                <span class="activity-time">${formatDate(activity.timestamp?.toDate())}</span>
+                            </div>
+                        `;
+                        recentActivityList.appendChild(activityElement);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+            }
+        }
+        
+        // Get appropriate icon for activity type
+        function getActivityIcon(type) {
+            const icons = {
+                'test_completed': 'fa-check-circle',
+                'test_started': 'fa-play-circle',
+                'level_up': 'fa-trophy',
+                'badge_earned': 'fa-award',
+                'default': 'fa-circle'
+            };
+            return icons[type] || icons['default'];
+        }
+        
+        // Sign out
+        if (signOutBtn) {
+            signOutBtn.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = 'auth/login-fixed.html';
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                    alert('Error signing out. Please try again.');
+                }
+            });
+        }
+        
+        // Initialize the app when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.sidebar') && !event.target.closest('.mobile-menu-toggle')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+            
+            // Check auth state
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in
+                    loadUserData(user);
+                } else {
+                    // User is signed out, redirect to login
+                    window.location.href = 'auth/login-fixed.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

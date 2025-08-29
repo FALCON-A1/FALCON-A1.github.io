@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Alpharia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        /* Profile dropdown styles */
+        .profile-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+        .profile-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            z-index: 1000;
+            margin-top: 10px;
+        }
+        .profile-dropdown:hover .profile-dropdown-menu {
+            display: block;
+        }
+        .profile-dropdown-item {
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .profile-dropdown-item:hover {
+            background: #f8f9fa;
+        }
+        .profile-dropdown-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .profile-dropdown-divider {
+            height: 1px;
+            background: #eee;
+            margin: 5px 0;
+        }
+        
+        /* Modal styles */
+        .modal-profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            display: block;
+            border: 3px solid #f0f0f0;
+        }
+        .profile-upload-btn {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .profile-upload-btn input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .role-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Alpharia</h2>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li class="active" data-section="overview">
+                        <i class="fas fa-home"></i> Overview
+                    </li>
+                    <!-- Teacher Navigation -->
+                    <li class="teacher-only" data-section="create-test">
+                        <i class="fas fa-plus-circle"></i> Create Test
+                    </li>
+                    <li class="teacher-only" data-section="manage-students">
+                        <i class="fas fa-users"></i> Manage Students
+                    </li>
+                    <li class="teacher-only" data-section="announcements">
+                        <i class="fas fa-bullhorn"></i> Announcements
+                    </li>
+                    <!-- Student Navigation -->
+                    <li class="student-only" data-section="available-tests">
+                        <i class="fas fa-tasks"></i> Available Tests
+                    </li>
+                    <li class="student-only" data-section="my-grades">
+                        <i class="fas fa-chart-line"></i> My Grades
+                    </li>
+                    <li class="student-only" data-section="test-history">
+                        <i class="fas fa-history"></i> Test History
+                    </li>
+                </ul>
+            </nav>
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">Loading...</span>
+                    <span class="user-role">Loading...</span>
+                </div>
+                <button id="logout-btn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <div class="user-actions">
+                    <button class="btn-notification me-3">
+                        <i class="far fa-bell"></i>
+                        <span class="notification-badge">0</span>
+                    </button>
+                    
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown">
+                        <div class="d-flex align-items-center">
+                            <div class="position-relative">
+                                <img id="header-avatar" src="assets/images/default-avatar.png" alt="User" class="rounded-circle" width="40" height="40">
+                                <span class="role-badge" id="role-badge">
+                                    <i class="fas fa-user-graduate"></i>
+                                </span>
+                            </div>
+                            <span class="ms-2 d-none d-md-inline" id="header-username">Loading...</span>
+                            <i class="fas fa-chevron-down ms-1 small"></i>
+                        </div>
+                        
+                        <div class="profile-dropdown-menu">
+                            <a href="#" class="profile-dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">
+                                <i class="fas fa-user"></i> My Profile
+                            </a>
+                            <a href="#" class="profile-dropdown-item">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="#" class="profile-dropdown-item text-danger" id="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic Content Sections -->
+            <div class="content-sections">
+                <!-- Overview Section -->
+                <section id="overview" class="content-section active">
+                    <h2>Overview</h2>
+                    <div class="overview-cards">
+                        <!-- Teacher Overview Cards -->
+                        <div class="teacher-only card">
+                            <div class="card-icon" style="background: #e3f2fd;">
+                                <i class="fas fa-users" style="color: #1976d2;"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3>Total Students</h3>
+                                <p class="card-number" id="total-students">0</p>
+                            </div>
+                        </div>
+                        <div class="teacher-only card">
+                            <div class="card-icon" style="background: #e8f5e9;">
+                                <i class="fas fa-tasks" style="color: #388e3c;"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3>Active Tests</h3>
+                                <p class="card-number" id="active-tests">0</p>
+                            </div>
+                        </div>
+                        <!-- Student Overview Cards -->
+                        <div class="student-only card">
+                            <div class="card-icon" style="background: #fff8e1;">
+                                <i class="fas fa-tasks" style="color: #ffa000;"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3>Pending Tests</h3>
+                                <p class="card-number" id="pending-tests">0</p>
+                            </div>
+                        </div>
+                        <div class="student-only card">
+                            <div class="card-icon" style="background: #f3e5f5;">
+                                <i class="fas fa-check-circle" style="color: #8e24aa;"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3>Completed Tests</h3>
+                                <p class="card-number" id="completed-tests">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-list" id="recent-activity">
+                            <!-- Dynamic content will be loaded here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Teacher Sections -->
+                <section id="create-test" class="content-section">
+                    <h2>Create New Test</h2>
+                    <div class="test-form">
+                        <div class="form-group">
+                            <label for="test-title">Test Title</label>
+                            <input type="text" id="test-title" placeholder="Enter test title">
+                        </div>
+                        <div class="form-group">
+                            <label for="test-description">Description</label>
+                            <textarea id="test-description" placeholder="Enter test description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="test-duration">Duration (minutes)</label>
+                            <input type="number" id="test-duration" min="1" value="30">
+                        </div>
+                        <div class="questions-container" id="questions-container">
+                            <!-- Questions will be added here -->
+                        </div>
+                        <button id="add-question" class="btn-primary">
+                            <i class="fas fa-plus"></i> Add Question
+                        </button>
+                        <div class="form-actions">
+                            <button id="save-draft" class="btn-secondary">Save as Draft</button>
+                            <button id="publish-test" class="btn-primary">Publish Test</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="manage-students" class="content-section">
+                    <h2>Manage Students</h2>
+                    <div class="student-list">
+                        <div class="list-header">
+                            <h3>Student Roster</h3>
+                            <button id="add-student" class="btn-primary">
+                                <i class="fas fa-user-plus"></i> Add Student
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Class</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-table-body">
+                                    <!-- Student data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Student Sections -->
+                <section id="available-tests" class="content-section">
+                    <h2>Available Tests</h2>
+                    <div class="tests-grid" id="available-tests-grid">
+                        <!-- Available tests will be loaded here -->
+                    </div>
+                </section>
+
+                <section id="test-history" class="content-section">
+                    <h2>Test History</h2>
+                    <div class="tests-grid" id="test-history-grid">
+                        <!-- Test history will be loaded here -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">My Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profile-form">
+                        <div class="text-center mb-4">
+                            <div class="profile-upload-btn">
+                                <img id="profile-preview" src="assets/images/default-avatar.png" alt="Profile" class="modal-profile-img">
+                                <input type="file" id="profile-picture" accept="image/*" class="d-none">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="document.getElementById('profile-picture').click()">
+                                    <i class="fas fa-camera me-1"></i> Change Photo
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="displayName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="displayName" name="displayName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="bio" class="form-label">Bio</label>
+                                    <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Student Fields -->
+                            <div id="student-fields">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="studentId" class="form-label">Student ID</label>
+                                            <input type="text" class="form-control" id="studentId" name="studentId">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="grade" class="form-label">Grade/Class</label>
+                                            <input type="text" class="form-control" id="grade" name="grade">
+                                        </div>
+                                    </div>
+                                </div>
+                                <h6 class="mt-4 mb-3">Parent/Guardian Information</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="parentName" class="form-label">Name</label>
+                                            <input type="text" class="form-control" id="parentName" name="parentName">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="parentEmail" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="parentEmail" name="parentEmail">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="parentPhone" class="form-label">Phone</label>
+                                            <input type="tel" class="form-control" id="parentPhone" name="parentPhone">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Teacher Fields -->
+                            <div id="teacher-fields" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="department" class="form-label">Department</label>
+                                            <input type="text" class="form-control" id="department" name="department">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="subjects" class="form-label">Subjects Taught</label>
+                                            <input type="text" class="form-control" id="subjects" name="subjects" placeholder="Math, Science, etc.">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="add-student-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Student</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-student-form">
+                    <div class="form-group">
+                        <label for="student-name">Full Name</label>
+                        <input type="text" id="student-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-email">Email</label>
+                        <input type="email" id="student-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-class">Class</label>
+                        <input type="text" id="student-class" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary close-modal">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

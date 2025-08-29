@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Reading Test - Alpharia</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/teacher-dashboard.css">
+    <link rel="stylesheet" href="css/test-creator.css">
+</head>
+<body class="teacher-dashboard">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Alpharia</h2>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="teacher-dashboard.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Create Test</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            <span>My Tests</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Students</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>Create New Reading Test</h1>
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        <img src="https://ui-avatars.com/api/?name=Teacher+Name" alt="User" class="rounded-circle">
+                    </div>
+                </div>
+            </header>
+
+            <div class="test-creator-container">
+                <!-- Test Info Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-info-circle"></i> Test Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="test-title">Test Title</label>
+                            <input type="text" id="test-title" class="form-control" placeholder="Enter test title" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="test-grade">Grade Level</label>
+                                <select id="test-grade" class="form-control" required>
+                                    <option value="">Select grade</option>
+                                    <option value="1">Grade 1</option>
+                                    <option value="2">Grade 2</option>
+                                    <option value="3">Grade 3</option>
+                                    <option value="4">Grade 4</option>
+                                    <option value="5">Grade 5</option>
+                                    <option value="6">Grade 6</option>
+                                    <option value="7">Grade 7</option>
+                                    <option value="8">Grade 8</option>
+                                    <option value="9">Grade 9</option>
+                                    <option value="10">Grade 10</option>
+                                    <option value="11">Grade 11</option>
+                                    <option value="12">Grade 12</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="test-time-limit">Time Limit (minutes)</label>
+                                <input type="number" id="test-time-limit" class="form-control" min="1" value="30">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="test-instructions">Instructions (Optional)</label>
+                            <textarea id="test-instructions" class="form-control" rows="3" placeholder="Enter test instructions"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sections Container -->
+                <div id="sections-container" class="sections-container">
+                    <!-- Sections will be added here dynamically -->
+                </div>
+
+                <!-- Add Section Button -->
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary" id="add-section-btn">
+                        <i class="fas fa-plus-circle"></i> Add Section
+                    </button>
+                </div>
+
+                <!-- Save & Preview Buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="save-draft-btn">
+                        <i class="fas fa-save"></i> Save as Draft
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="preview-test-btn">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                    <button type="button" class="btn btn-success" id="publish-test-btn">
+                        <i class="fas fa-paper-plane"></i> Publish Test
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Section Template (Hidden) -->
+    <template id="section-template">
+        <div class="card section-card" data-section-id="">
+            <div class="card-header">
+                <div class="section-header">
+                    <h3 class="section-title">Untitled Section</h3>
+                    <div class="section-actions">
+                        <button class="btn btn-sm btn-icon move-section-up" title="Move Up">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="btn btn-sm btn-icon move-section-down" title="Move Down">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button class="btn btn-sm btn-icon delete-section" title="Delete Section">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Section Title</label>
+                    <input type="text" class="form-control section-title-input" placeholder="Enter section title" required>
+                </div>
+                <div class="form-group">
+                    <label>Instructions (Optional)</label>
+                    <textarea class="form-control section-instructions" rows="2" placeholder="Enter section instructions"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Section Type</label>
+                    <select class="form-control section-type" required>
+                        <option value="words">Words</option>
+                        <option value="sentences">Sentences</option>
+                        <option value="passage">Reading Passage</option>
+                    </select>
+                </div>
+                
+                <!-- Items Container -->
+                <div class="items-container">
+                    <!-- Items will be added here dynamically -->
+                </div>
+                
+                <!-- Add Item Button -->
+                <button class="btn btn-outline btn-sm add-item-btn">
+                    <i class="fas fa-plus"></i> Add Item
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Item Template (Hidden) -->
+    <template id="word-item-template">
+        <div class="item-card" data-item-id="">
+            <div class="item-content">
+                <div class="form-group">
+                    <label>Word</label>
+                    <input type="text" class="form-control item-text" placeholder="Enter word" required>
+                </div>
+                <div class="form-group">
+                    <label>Points</label>
+                    <input type="number" class="form-control item-points" min="1" value="1" required>
+                </div>
+            </div>
+            <div class="item-actions">
+                <button class="btn btn-sm btn-icon move-item-up" title="Move Up">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+                <button class="btn btn-sm btn-icon move-item-down" title="Move Down">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+                <button class="btn btn-sm btn-icon delete-item" title="Delete">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { 
+            initializeApp 
+        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            setPersistence,
+            browserSessionPersistence,
+            browserLocalPersistence
+        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            updateDoc, 
+            doc,
+            serverTimestamp 
+        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            // Replace with your actual Firebase config
+            apiKey: "AIzaSyD8wzA2bX2jzvJ1wR4X5XwQdQk8cZ6X9Y0",
+            authDomain: "alpharia-12345.firebaseapp.com",
+            projectId: "alpharia-12345",
+            storageBucket: "alpharia-12345.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abc123def456"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Set persistence to LOCAL to keep user logged in
+        setPersistence(auth, browserLocalPersistence)
+            .then(() => {
+                console.log('Auth persistence set to LOCAL');
+            })
+            .catch((error) => {
+                console.error('Error setting auth persistence:', error);
+            });
+        
+        // Function to log auth state
+        function logAuthState(user) {
+            console.log('Auth State Changed:', user ? 'User is signed in' : 'No user signed in');
+            if (user) {
+                console.log('User UID:', user.uid);
+                console.log('Email:', user.email);
+                console.log('Email Verified:', user.emailVerified);
+                console.log('Auth Persistence:', auth.currentUser ? 'User exists in auth' : 'No user in auth');
+            }
+        }
+
+        // Initialize the test creator when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM Content Loaded');
+            
+            // First, check current auth state
+            console.log('Initial auth state:', auth.currentUser ? 'Logged in' : 'Not logged in');
+            
+            // Set up auth state observer with logging
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                logAuthState(user);
+                
+                if (user) {
+                    // User is signed in, initialize the test creator
+                    console.log('Initializing test creator...');
+                    init();
+                } else {
+                    // User is signed out, redirect to login
+                    console.log('No user signed in, redirecting to login...');
+                    window.location.href = 'auth/login-fixed.html';
+                }
+            });
+            
+            // Clean up the auth state observer when the component unmounts
+            window.addEventListener('beforeunload', () => {
+                unsubscribe();
+            });
+            // DOM Elements
+            const sectionsContainer = document.getElementById('sections-container');
+            const addSectionBtn = document.getElementById('add-section-btn');
+            const saveDraftBtn = document.getElementById('save-draft-btn');
+            const previewTestBtn = document.getElementById('preview-test-btn');
+            const publishTestBtn = document.getElementById('publish-test-btn');
+            const sectionTemplate = document.getElementById('section-template');
+            
+            // State
+            let sectionCount = 0;
+            let itemCount = 0;
+            
+            // Initialize the test creator
+            function init() {
+                console.log('Initializing test creator...');
+                // Add event listeners
+                if (addSectionBtn) {
+                    console.log('Adding click event to Add Section button');
+                    addSectionBtn.addEventListener('click', addNewSection);
+                }
+                if (saveDraftBtn) saveDraftBtn.addEventListener('click', saveAsDraft);
+                if (previewTestBtn) previewTestBtn.addEventListener('click', previewTest);
+                if (publishTestBtn) publishTestBtn.addEventListener('click', publishTest);
+                
+                // Add the first section by default
+                addNewSection();
+            }
+            
+            // Add a new section to the test
+            function addNewSection() {
+                console.log('Adding new section...');
+                sectionCount++;
+                const sectionId = `section-${sectionCount}`;
+                
+                // Clone the section template
+                const sectionElement = sectionTemplate.content.cloneNode(true);
+                const sectionCard = sectionElement.querySelector('.section-card');
+                sectionCard.dataset.sectionId = sectionId;
+                
+                // Update section title
+                const titleInput = sectionElement.querySelector('.section-title-input');
+                titleInput.value = `Section ${sectionCount}`;
+                titleInput.addEventListener('input', (e) => {
+                    const title = e.target.value || `Section ${sectionCount}`;
+                    sectionCard.querySelector('.section-title').textContent = title;
+                });
+                
+                // Add the section to the container
+                if (sectionsContainer) {
+                    sectionsContainer.appendChild(sectionElement);
+                    console.log('Section added to container');
+                } else {
+                    console.error('Sections container not found');
+                }
+            }
+            
+            // Save the test as a draft
+            async function saveAsDraft() {
+                try {
+                    const testData = getTestData();
+                    testData.status = 'draft';
+                    testData.createdAt = serverTimestamp();
+                    testData.updatedAt = serverTimestamp();
+                    
+                    const user = auth.currentUser;
+                    
+                    if (!user) {
+                        throw new Error('User not authenticated');
+                    }
+                    
+                    // Add the user ID to the test data
+                    testData.teacherId = user.uid;
+                    
+                    // Save to Firestore
+                    const docRef = await addDoc(collection(db, 'tests'), testData);
+                    showNotification('Draft saved successfully!', 'success');
+                    return docRef.id;
+                } catch (error) {
+                    console.error('Error saving draft:', error);
+                    showNotification('Failed to save draft: ' + error.message, 'error');
+                    throw error;
+                }
+            }
+            
+            // Preview the test
+            function previewTest() {
+                // Implementation for previewing the test
+                showNotification('Preview functionality coming soon!', 'info');
+            }
+            
+            // Publish the test
+            async function publishTest() {
+                try {
+                    const testData = getTestData();
+                    testData.status = 'published';
+                    testData.publishedAt = serverTimestamp();
+                    testData.updatedAt = serverTimestamp();
+                    
+                    const user = auth.currentUser;
+                    
+                    if (!user) {
+                        throw new Error('User not authenticated');
+                    }
+                    
+                    // Add the user ID to the test data
+                    testData.teacherId = user.uid;
+                    
+                    let docRef;
+                    
+                    if (testData.id) {
+                        // Update existing test
+                        await updateDoc(doc(db, 'tests', testData.id), testData);
+                        docRef = testData.id;
+                    } else {
+                        // Create new test
+                        docRef = await addDoc(collection(db, 'tests'), testData);
+                    }
+                    
+                    showNotification('Test published successfully!', 'success');
+                    
+                    // Redirect to dashboard after a short delay
+                    setTimeout(() => {
+                        window.location.href = 'teacher-dashboard.html';
+                    }, 1500);
+                    
+                    return docRef.id || docRef;
+                } catch (error) {
+                    console.error('Error publishing test:', error);
+                    showNotification('Failed to publish test: ' + error.message, 'error');
+                    throw error;
+                }
+            }
+            
+            // Get all test data as an object
+            function getTestData() {
+                const testData = {
+                    title: document.getElementById('test-title')?.value || 'Untitled Test',
+                    description: document.getElementById('test-description')?.value || '',
+                    grade: document.getElementById('test-grade')?.value || '',
+                    subject: document.getElementById('test-subject')?.value || '',
+                    sections: [],
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                };
+                
+                // Add sections data
+                const sections = document.querySelectorAll('.section-card');
+                sections.forEach((section, index) => {
+                    const sectionData = {
+                        id: section.dataset.sectionId || `section-${index + 1}`,
+                        title: section.querySelector('.section-title-input')?.value || `Section ${index + 1}`,
+                        type: section.querySelector('.section-type')?.value || 'words',
+                        instructions: section.querySelector('.section-instructions')?.value || '',
+                        items: []
+                    };
+                    
+                    // Add items data
+                    const items = section.querySelectorAll('.test-item');
+                    items.forEach(item => {
+                        const itemData = {
+                            id: item.dataset.itemId || `item-${Date.now()}`,
+                            type: sectionData.type,
+                            content: item.querySelector('.item-content')?.value || '',
+                            answer: item.querySelector('.item-answer')?.value || ''
+                        };
+                        sectionData.items.push(itemData);
+                    });
+                    
+                    testData.sections.push(sectionData);
+                });
+                
+                return testData;
+            }
+            
+            // Show notification to the user
+            function showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                // Add to the page
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+            
+            // Auth state is now handled at the top of the DOMContentLoaded
+            
+        });
+    </script>
+</body>
+</html>
