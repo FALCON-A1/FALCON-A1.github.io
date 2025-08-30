@@ -642,11 +642,19 @@
                     // Redirect to student dashboard
                     window.location.href = '../student-dashboard-clean.html';
                 } else {
-                    // User exists, redirect to appropriate dashboard
+                    // User exists, redirect to appropriate dashboard or requested page
                     const userDoc = await getDoc(doc(db, 'users', user.uid));
                     const userData = userDoc.data();
                     
-                    if (userData && userData.userType === 'teacher') {
+                    // Check for redirect URL in query parameters
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectUrl = urlParams.get('redirect');
+                    
+                    if (redirectUrl) {
+                        // If there's a redirect URL, use it
+                        window.location.href = redirectUrl.includes('..') ? redirectUrl : `../${redirectUrl}`;
+                    } else if (userData && userData.userType === 'teacher') {
+                        // Default to teacher dashboard if no redirect URL
                         window.location.href = '../teacher-dashboard.html';
                     } else {
                         window.location.href = '../student-dashboard-clean.html';
