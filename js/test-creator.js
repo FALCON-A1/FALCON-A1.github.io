@@ -5,9 +5,11 @@ import {
     addDoc, 
     updateDoc, 
     doc,
-    serverTimestamp
+    serverTimestamp,
+    Timestamp
 } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+import { db } from '../firebase.js'; // Import the initialized Firestore instance
 
 // Export the init function to be called after Firebase is initialized
 export function initTestCreator() {
@@ -246,134 +248,276 @@ export function initTestCreator() {
     
     // Publish the test
     async function publishTest() {
-        if (!validateTest(false)) return;
+        if (!validateTest(false)) {
+            showNotification('Please fix validation errors before publishing', 'error');
+            return;
+        }
+        
+        const publishBtn = document.getElementById('publish-test-btn');
+        const originalBtnText = publishBtn.innerHTML;
         
         try {
-            const testData = getTestData();
-            testData.status = 'published';
-            testData.publishedAt = serverTimestamp();
-            testData.updatedAt = serverTimestamp();
+            // Show loading state
+            publishBtn.disabled = true;
+            publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
             
-            const db = getFirestore();
+            // Get test data
+            let testData = getTestData();
+            
             const user = getAuth().currentUser;
-            
             if (!user) {
-                throw new Error('User not authenticated');
+                throw new Error('User not authenticated. Please log in again.');
             }
             
-            // Add the user ID to the test data
-            testData.teacherId = user.uid;
+            // Prepare test data for Firestore
+            const testDoc = {
+                ...testData,
+                teacherId: user.uid, // Must be set before any other operations
+                status: 'published',
+                publishedAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                createdAt: testData.createdAt || serverTimestamp(),
+                // Ensure all required fields have default values
+                title: testData.title || 'Untitled Test',
+                grade: testData.grade || '',
+                timeLimit: testData.timeLimit || 30,
+                instructions: testData.instructions || '',
+                sections: Array.isArray(testData.sections) ? testData.sections : []
+            };
             
+            // Make sure sections and items are properly formatted
+            if (!Array.isArray(testDoc.sections)) {
+                testDoc.sections = [];
+            }
+            
+            // Save to Firestore
             let docRef;
-            
-            if (testData.id) {
-                // Update existing test
-                await updateDoc(doc(db, 'tests', testData.id), testData);
-                docRef = testData.id;
-            } else {
-                // Create new test
-                docRef = await addDoc(collection(db, 'tests'), testData);
+            try {
+                if (testDoc.id) {
+                    // Update existing test
+                    const testRef = doc(db, 'tests', testDoc.id);
+                    // Create update object without teacherId to prevent overwriting the original creator
+                    const { teacherId, ...updateData } = testDoc;
+                    await updateDoc(testRef, {
+                        ...updateData,
+                        updatedAt: serverTimestamp()
+                    });
+                    docRef = testDoc.id;
+                } else {
+                    // Create new test - ensure teacherId is set for security rule validation
+                    const newTestRef = await addDoc(collection(db, 'tests'), testDoc);
+                    testDoc.id = newTestRef.id; // Store the generated ID
+                    docRef = newTestRef;
+                }
+                
+                showNotification('Test published successfully!', 'success');
+                
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {
+                    window.location.href = 'teacher-dashboard.html';
+                }, 1500);
+                
+                return testDoc.id || (docRef?.id || '');
+            } catch (firestoreError) {
+                console.error('Firestore error:', firestoreError);
+                throw firestoreError; // Re-throw to be caught by the outer catch
             }
             
-            showNotification('Test published successfully!', 'success');
-            
-            // Redirect to dashboard after a short delay
-            setTimeout(() => {
-                window.location.href = 'teacher-dashboard.html';
-            }, 1500);
-            
-            return docRef.id || docRef;
         } catch (error) {
             console.error('Error publishing test:', error);
-            showNotification('Failed to publish test: ' + error.message, 'error');
+            let errorMessage = 'Failed to publish test';
+            
+            // Provide more specific error messages
+            if (error.code === 'permission-denied') {
+                errorMessage = 'Permission denied. You may not have the necessary permissions.';
+            } else if (error.code === 'unauthenticated') {
+                errorMessage = 'You need to be logged in to publish tests.';
+            } else if (error.message) {
+                errorMessage += ': ' + error.message;
+            }
+            
+            showNotification(errorMessage, 'error');
             throw error;
+            
+        } finally {
+            // Reset button state
+            if (publishBtn) {
+                publishBtn.disabled = false;
+                publishBtn.innerHTML = originalBtnText;
+            }
         }
     }
     
     // Get all test data as an object
     function getTestData() {
-        const testData = {
-            title: document.getElementById('test-title').value,
-            grade: document.getElementById('test-grade').value,
-            timeLimit: parseInt(document.getElementById('test-time-limit').value) || 30,
-            instructions: document.getElementById('test-instructions').value,
-            sections: []
-        };
-        
-        // Get data from each section
-        const sectionElements = document.querySelectorAll('.section-card');
-        sectionElements.forEach((sectionEl, index) => {
-            const sectionData = {
-                id: sectionEl.dataset.sectionId,
-                title: sectionEl.querySelector('.section-title-input').value,
-                instructions: sectionEl.querySelector('.section-instructions').value,
-                type: sectionEl.querySelector('.section-type').value,
-                items: []
+        try {
+            const testData = {
+                title: document.getElementById('test-title')?.value || 'Untitled Test',
+                grade: document.getElementById('test-grade')?.value || '',
+                timeLimit: parseInt(document.getElementById('test-time-limit')?.value) || 30,
+                instructions: document.getElementById('test-instructions')?.value || '',
+                sections: []
             };
             
-            // Get items for this section
-            const itemElements = sectionEl.querySelectorAll('.item-card');
-            itemElements.forEach(itemEl => {
-                if (sectionData.type === 'passage') {
-                    sectionData.items.push({
-                        id: itemEl.dataset.itemId,
-                        title: itemEl.querySelector('input[type="text"]').value,
-                        content: itemEl.querySelector('textarea').value,
-                        question: itemEl.querySelectorAll('input[type="text"]')[1]?.value || '',
-                        points: parseInt(itemEl.querySelector('.item-points').value) || 5
+            // Ensure timeLimit is a valid number
+            if (isNaN(testData.timeLimit) || testData.timeLimit < 1) {
+                testData.timeLimit = 30;
+            }
+            
+            // Get data from each section
+            const sectionElements = document.querySelectorAll('.section-card');
+            sectionElements.forEach((sectionEl) => {
+                try {
+                    const sectionData = {
+                        id: sectionEl.dataset.sectionId || `section-${Date.now()}`,
+                        title: sectionEl.querySelector('.section-title-input')?.value || 'Untitled Section',
+                        instructions: sectionEl.querySelector('.section-instructions')?.value || '',
+                        type: sectionEl.querySelector('.section-type')?.value || 'words',
+                        items: []
+                    };
+                    
+                    // Get items for this section
+                    const itemElements = sectionEl.querySelectorAll('.item-card');
+                    itemElements.forEach(itemEl => {
+                        try {
+                            const itemId = itemEl.dataset.itemId || `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+                            const points = parseInt(itemEl.querySelector('.item-points')?.value) || 1;
+                            
+                            const itemText = itemEl.querySelector('.item-text')?.value.trim() || '';
+                            
+                            if (sectionData.type === 'passage') {
+                                const inputs = itemEl.querySelectorAll('input[type="text"]');
+                                sectionData.items.push({
+                                    id: itemId,
+                                    title: (inputs[0]?.value || 'Untitled Passage').trim(),
+                                    content: (itemEl.querySelector('textarea')?.value || '').trim(),
+                                    question: (inputs[1]?.value || '').trim(),
+                                    points: points > 0 ? points : 1
+                                });
+                            } else if (sectionData.type === 'letters') {
+                                // For letter items, ensure we have a single character
+                                if (itemText.length === 1) {
+                                    sectionData.items.push({
+                                        id: itemId,
+                                        text: itemText,
+                                        points: points > 0 ? points : 1
+                                    });
+                                }
+                            } else {
+                                // For words and sentences
+                                if (itemText) {
+                                    sectionData.items.push({
+                                        id: itemId,
+                                        text: itemText,
+                                        points: points > 0 ? points : 1
+                                    });
+                                }
+                            }
+                        } catch (itemError) {
+                            console.error('Error processing item:', itemError);
+                            // Skip invalid items
+                        }
                     });
-                } else {
-                    sectionData.items.push({
-                        id: itemEl.dataset.itemId,
-                        text: itemEl.querySelector('.item-text').value,
-                        points: parseInt(itemEl.querySelector('.item-points').value) || 1
-                    });
+                    
+                    // Only add section if it has items
+                    if (sectionData.items.length > 0) {
+                        testData.sections.push(sectionData);
+                    }
+                    
+                } catch (sectionError) {
+                    console.error('Error processing section:', sectionError);
+                    // Skip invalid sections
                 }
             });
             
-            testData.sections.push(sectionData);
-        });
-        
-        return testData;
+            return testData;
+            
+        } catch (error) {
+            console.error('Error getting test data:', error);
+            throw new Error('Failed to prepare test data: ' + (error.message || 'Unknown error'));
+        }
     }
     
     // Show notification to the user
     function showNotification(message, type = 'info') {
-        // Remove any existing notifications
-        const existingNotification = document.querySelector('.notification');
-        if (existingNotification) {
-            existingNotification.remove();
+        try {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notif => notif.remove());
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                color: white;
+                border-radius: 4px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                z-index: 1000;
+                max-width: 350px;
+                transform: translateX(120%);
+                transition: transform 0.3s ease-in-out;
+                opacity: 0.95;
+            `;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center;">
+                    <i class="fas ${icon}" style="margin-right: 10px; font-size: 1.2em;"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="notification-close" style="background: none; border: none; color: white; cursor: pointer; margin-left: 15px; font-size: 1.2em;">
+                    &times;
+                </button>
+            `;
+            
+            // Add close button functionality
+            const closeButton = notification.querySelector('.notification-close');
+            closeButton.addEventListener('click', () => {
+                notification.style.transform = 'translateX(120%)';
+                setTimeout(() => notification.remove(), 300);
+            });
+            
+            // Add to DOM
+            document.body.appendChild(notification);
+            
+            // Trigger animation
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Auto-remove after 5 seconds
+            const autoRemove = setTimeout(() => {
+                notification.style.transform = 'translateX(120%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+            
+            // Pause auto-remove on hover
+            notification.addEventListener('mouseenter', () => {
+                clearTimeout(autoRemove);
+            });
+            
+            notification.addEventListener('mouseleave', () => {
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(120%)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 1000);
+            });
+            
+        } catch (error) {
+            console.error('Error showing notification:', error);
+            // Fallback to alert if there's an error with the custom notification
+            alert(`${type.toUpperCase()}: ${message}`);
         }
-        
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                <span>${message}</span>
-            </div>
-            <button class="notification-close">&times;</button>
-        `;
-        
-        // Add close button functionality
-        const closeButton = notification.querySelector('.notification-close');
-        closeButton.addEventListener('click', () => {
-            notification.remove();
-        });
-        
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            notification.classList.add('fade-out');
-            setTimeout(() => notification.remove(), 300);
-        }, 5000);
-        
-        // Add to DOM
-        document.body.appendChild(notification);
-        
-        // Trigger reflow to enable animation
-        notification.offsetHeight;
-        notification.classList.add('show');
     }
     
     // Validate the test before saving or publishing

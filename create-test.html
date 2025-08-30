@@ -152,7 +152,7 @@
         <div class="card section-card" data-section-id="">
             <div class="card-header">
                 <div class="section-header">
-                    <h3 class="section-title">Untitled Section</h3>
+                    <h3 class="section-title">New Section</h3>
                     <div class="section-actions">
                         <button class="btn btn-sm btn-icon move-section-up" title="Move Up">
                             <i class="fas fa-arrow-up"></i>
@@ -178,6 +178,7 @@
                 <div class="form-group">
                     <label>Section Type</label>
                     <select class="form-control section-type" required>
+                        <option value="letters">Letters</option>
                         <option value="words">Words</option>
                         <option value="sentences">Sentences</option>
                         <option value="passage">Reading Passage</option>
@@ -189,6 +190,72 @@
                     <!-- Items will be added here dynamically -->
                 </div>
                 
+                <!-- Add your custom styles here -->
+                <style>
+                    /* Success Modal Styles */
+                    .success-modal {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: rgba(0, 0, 0, 0.7);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 1000;
+                        opacity: 0;
+                        visibility: hidden;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .success-modal.active {
+                        opacity: 1;
+                        visibility: visible;
+                    }
+                    
+                    .success-content {
+                        background: white;
+                        padding: 2rem;
+                        border-radius: 8px;
+                        text-align: center;
+                        max-width: 400px;
+                        width: 90%;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                        transform: translateY(20px);
+                        transition: transform 0.3s ease;
+                    }
+                    
+                    .success-modal.active .success-content {
+                        transform: translateY(0);
+                    }
+                    
+                    .success-icon {
+                        font-size: 4rem;
+                        color: #28a745;
+                        margin-bottom: 1rem;
+                    }
+                    
+                    .success-content h3 {
+                        margin: 0 0 1rem 0;
+                        color: #2c3e50;
+                    }
+                    
+                    .success-content p {
+                        margin-bottom: 1.5rem;
+                        color: #555;
+                    }
+                    
+                    .success-content .btn {
+                        min-width: 150px;
+                    }
+                    
+                    /* Loading state for publish button */
+                    .publish-btn .fa-spinner {
+                        margin-right: 8px;
+                    }
+                </style>
+                
                 <!-- Add Item Button -->
                 <button class="btn btn-outline btn-sm add-item-btn">
                     <i class="fas fa-plus"></i> Add Item
@@ -197,9 +264,9 @@
         </div>
     </template>
 
-    <!-- Item Template (Hidden) -->
+    <!-- Word Item Template -->
     <template id="word-item-template">
-        <div class="item-card" data-item-id="">
+        <div class="item-card" data-item-type="word" data-item-id="">
             <div class="item-content">
                 <div class="form-group">
                     <label>Word</label>
@@ -211,13 +278,110 @@
                 </div>
             </div>
             <div class="item-actions">
-                <button class="btn btn-sm btn-icon move-item-up" title="Move Up">
+                <button type="button" class="btn btn-sm btn-icon move-item-up" title="Move Up">
                     <i class="fas fa-arrow-up"></i>
                 </button>
-                <button class="btn btn-sm btn-icon move-item-down" title="Move Down">
+                <button type="button" class="btn btn-sm btn-icon move-item-down" title="Move Down">
                     <i class="fas fa-arrow-down"></i>
                 </button>
-                <button class="btn btn-sm btn-icon delete-item" title="Delete">
+                <button type="button" class="btn btn-sm btn-icon delete-item" title="Delete">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Letter Item Template -->
+    <template id="letter-item-template">
+        <div class="item-card" data-item-type="letter" data-item-id="">
+            <div class="item-content">
+                <div class="form-group">
+                    <label>Letter</label>
+                    <input type="text" class="form-control item-text" placeholder="Enter letter" maxlength="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Example Word</label>
+                    <input type="text" class="form-control item-example" placeholder="Example word with this letter">
+                </div>
+                <div class="form-group">
+                    <label>Points</label>
+                    <input type="number" class="form-control item-points" min="1" value="1" required>
+                </div>
+            </div>
+            <div class="item-actions">
+                <button type="button" class="btn btn-sm btn-icon move-item-up" title="Move Up">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-icon move-item-down" title="Move Down">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-icon delete-item" title="Delete">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Sentence Item Template -->
+    <template id="sentence-item-template">
+        <div class="item-card" data-item-type="sentence" data-item-id="">
+            <div class="item-content">
+                <div class="form-group">
+                    <label>Sentence</label>
+                    <textarea class="form-control item-text" rows="2" placeholder="Enter sentence" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Focus Word</label>
+                    <input type="text" class="form-control item-focus" placeholder="Word to focus on (optional)">
+                </div>
+                <div class="form-group">
+                    <label>Points</label>
+                    <input type="number" class="form-control item-points" min="1" value="2" required>
+                </div>
+            </div>
+            <div class="item-actions">
+                <button type="button" class="btn btn-sm btn-icon move-item-up" title="Move Up">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-icon move-item-down" title="Move Down">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-icon delete-item" title="Delete">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Passage Item Template -->
+    <template id="passage-item-template">
+        <div class="item-card" data-item-type="passage" data-item-id="">
+            <div class="item-content">
+                <div class="form-group">
+                    <label>Passage Title</label>
+                    <input type="text" class="form-control item-title" placeholder="Enter passage title" required>
+                </div>
+                <div class="form-group">
+                    <label>Passage Content</label>
+                    <textarea class="form-control item-text" rows="4" placeholder="Enter passage content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Comprehension Question (Optional)</label>
+                    <input type="text" class="form-control item-question" placeholder="Add a question about this passage">
+                </div>
+                <div class="form-group">
+                    <label>Points</label>
+                    <input type="number" class="form-control item-points" min="1" value="5" required>
+                </div>
+            </div>
+            <div class="item-actions">
+                <button type="button" class="btn btn-sm btn-icon move-item-up" title="Move Up">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-icon move-item-down" title="Move Down">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-icon delete-item" title="Delete">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -246,12 +410,14 @@
             addDoc, 
             updateDoc, 
             doc,
-            serverTimestamp 
+            serverTimestamp,
+            enableIndexedDbPersistence
         } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+        
+        import { getApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
-            // Replace with your actual Firebase config
             apiKey: "AIzaSyD8wzA2bX2jzvJ1wR4X5XwQdQk8cZ6X9Y0",
             authDomain: "alpharia-12345.firebaseapp.com",
             projectId: "alpharia-12345",
@@ -261,18 +427,71 @@
         };
         
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app;
+        let auth;
+        let db;
+        
+        try {
+            // Check if Firebase is already initialized
+            app = initializeApp(firebaseConfig, 'test-creator');
+            auth = getAuth(app);
+            db = getFirestore(app);
+            
+            // Enable offline persistence
+            enableIndexedDbPersistence(db).catch((err) => {
+                if (err.code === 'failed-precondition') {
+                    console.warn('Offline persistence can only be enabled in one tab at a time.');
+                } else if (err.code === 'unimplemented') {
+                    console.warn('The current browser does not support offline persistence.');
+                }
+            });
+            
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            // If already initialized, get the existing instance
+            if (error.code === 'app/duplicate-app') {
+                app = getApp('test-creator');
+                auth = getAuth(app);
+                db = getFirestore(app);
+                console.log('Using existing Firebase app instance');
+            } else {
+                throw error;
+            }
+        }
         
         // Set persistence to LOCAL to keep user logged in
         setPersistence(auth, browserLocalPersistence)
             .then(() => {
                 console.log('Auth persistence set to LOCAL');
+                // Only initialize the app after persistence is set
+                initApp();
             })
             .catch((error) => {
                 console.error('Error setting auth persistence:', error);
+                // Still try to initialize the app even if persistence fails
+                initApp();
             });
+            
+        function initApp() {
+            // Initialize the test creator when the page loads
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('DOM Content Loaded');
+                
+                // Initialize the test creator
+                console.log('Initializing test creator...');
+                init();
+                
+                // Log auth state but don't redirect
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        console.log('User is signed in:', user.email);
+                    } else {
+                        console.log('No user is signed in - but not redirecting');
+                    }
+                });
+            });
+        }
         
         // Function to log auth state
         function logAuthState(user) {
@@ -285,52 +504,65 @@
             }
         }
 
+        // State
+        let sectionCount = 0;
+        let itemCount = 0;
+        
+        // DOM Elements
+        let sectionsContainer;
+        let addSectionBtn;
+        let saveDraftBtn;
+        let previewTestBtn;
+        let publishTestBtn;
+        let sectionTemplate;
+        
         // Initialize the test creator when the page loads
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM Content Loaded');
             
-            // First, check current auth state
-            console.log('Initial auth state:', auth.currentUser ? 'Logged in' : 'Not logged in');
+            // Initialize the test creator
+            console.log('Initializing test creator...');
+            init();
             
-            // Set up auth state observer with logging
-            const unsubscribe = onAuthStateChanged(auth, (user) => {
-                logAuthState(user);
-                
+            // Optional: Still log auth state but don't redirect
+            onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    // User is signed in, initialize the test creator
-                    console.log('Initializing test creator...');
-                    init();
+                    console.log('User is signed in:', user.email);
                 } else {
-                    // User is signed out, redirect to login
-                    console.log('No user signed in, redirecting to login...');
-                    window.location.href = 'auth/login-fixed.html';
+                    console.log('No user is signed in');
                 }
             });
-            
-            // Clean up the auth state observer when the component unmounts
-            window.addEventListener('beforeunload', () => {
-                unsubscribe();
-            });
-            // DOM Elements
-            const sectionsContainer = document.getElementById('sections-container');
-            const addSectionBtn = document.getElementById('add-section-btn');
-            const saveDraftBtn = document.getElementById('save-draft-btn');
-            const previewTestBtn = document.getElementById('preview-test-btn');
-            const publishTestBtn = document.getElementById('publish-test-btn');
-            const sectionTemplate = document.getElementById('section-template');
-            
-            // State
-            let sectionCount = 0;
-            let itemCount = 0;
-            
-            // Initialize the test creator
-            function init() {
+        });
+        
+        // Initialize the test creator
+        function init() {
                 console.log('Initializing test creator...');
+                
+                // Initialize DOM elements
+                sectionsContainer = document.getElementById('sections-container');
+                addSectionBtn = document.getElementById('add-section-btn');
+                saveDraftBtn = document.getElementById('save-draft-btn');
+                previewTestBtn = document.getElementById('preview-test-btn');
+                publishTestBtn = document.getElementById('publish-test-btn');
+                sectionTemplate = document.getElementById('section-template');
+                
+                console.log('DOM Elements:', { 
+                    sectionsContainer: !!sectionsContainer,
+                    addSectionBtn: !!addSectionBtn,
+                    saveDraftBtn: !!saveDraftBtn,
+                    previewTestBtn: !!previewTestBtn,
+                    publishTestBtn: !!publishTestBtn,
+                    sectionTemplate: !!sectionTemplate
+                });
+                
                 // Add event listeners
                 if (addSectionBtn) {
                     console.log('Adding click event to Add Section button');
                     addSectionBtn.addEventListener('click', addNewSection);
+                } else {
+                    console.error('Add Section button not found!');
                 }
+                
                 if (saveDraftBtn) saveDraftBtn.addEventListener('click', saveAsDraft);
                 if (previewTestBtn) previewTestBtn.addEventListener('click', previewTest);
                 if (publishTestBtn) publishTestBtn.addEventListener('click', publishTest);
@@ -345,18 +577,63 @@
                 sectionCount++;
                 const sectionId = `section-${sectionCount}`;
                 
+                // Check if template exists
+                if (!sectionTemplate) {
+                    console.error('Section template not found!');
+                    return;
+                }
+                
                 // Clone the section template
-                const sectionElement = sectionTemplate.content.cloneNode(true);
+                const sectionElement = document.importNode(sectionTemplate.content, true);
                 const sectionCard = sectionElement.querySelector('.section-card');
+                
+                if (!sectionCard) {
+                    console.error('Could not find section card in template');
+                    return;
+                }
+                
                 sectionCard.dataset.sectionId = sectionId;
                 
-                // Update section title
-                const titleInput = sectionElement.querySelector('.section-title-input');
-                titleInput.value = `Section ${sectionCount}`;
-                titleInput.addEventListener('input', (e) => {
-                    const title = e.target.value || `Section ${sectionCount}`;
-                    sectionCard.querySelector('.section-title').textContent = title;
-                });
+                // Create section title element if it doesn't exist
+                let sectionTitle = sectionCard.querySelector('.section-title');
+                if (!sectionTitle) {
+                    sectionTitle = document.createElement('h3');
+                    sectionTitle.className = 'section-title';
+                    sectionTitle.textContent = ''; // Start with empty title
+                    
+                    // Insert the title before the section actions
+                    const sectionHeader = sectionCard.querySelector('.section-header');
+                    if (sectionHeader) {
+                        sectionHeader.insertBefore(sectionTitle, sectionHeader.firstChild);
+                    }
+                }
+                
+                // Update section title input
+                const titleInput = sectionCard.querySelector('.section-title-input');
+                if (titleInput) {
+                    titleInput.placeholder = 'Enter section title';
+                    titleInput.value = ''; // Clear any default value
+                    
+                    titleInput.addEventListener('input', (e) => {
+                        const title = e.target.value.trim();
+                        if (sectionTitle) {
+                            sectionTitle.textContent = title;
+                        }
+                    });
+                    
+                    // Focus the title input when section is created
+                    setTimeout(() => {
+                        titleInput.focus();
+                    }, 0);
+                }
+                
+                // Add event listeners for section actions
+                const deleteBtn = sectionCard.querySelector('.delete-section');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        sectionCard.remove();
+                    });
+                }
                 
                 // Add the section to the container
                 if (sectionsContainer) {
@@ -364,6 +641,129 @@
                     console.log('Section added to container');
                 } else {
                     console.error('Sections container not found');
+                }
+                
+                // Initialize any additional section functionality
+                initSectionFunctionality(sectionCard);
+            }
+            
+            // Initialize functionality for a section
+            function initSectionFunctionality(section) {
+                if (!sectionsContainer) {
+                    console.error('Sections container not initialized');
+                    return;
+                }
+                
+                // Add item button
+                const addItemBtn = section.querySelector('.add-item-btn');
+                if (addItemBtn) {
+                    addItemBtn.addEventListener('click', () => {
+                        addNewItem(section);
+                    });
+                }
+                
+                // Move up/down buttons
+                const moveUpBtn = section.querySelector('.move-section-up');
+                const moveDownBtn = section.querySelector('.move-section-down');
+                
+                if (moveUpBtn) {
+                    moveUpBtn.addEventListener('click', () => {
+                        const prev = section.previousElementSibling;
+                        if (prev && prev !== sectionsContainer.firstElementChild) {
+                            sectionsContainer.insertBefore(section, prev);
+                        }
+                    });
+                }
+                
+                if (moveDownBtn) {
+                    moveDownBtn.addEventListener('click', () => {
+                        const next = section.nextElementSibling;
+                        if (next) {
+                            sectionsContainer.insertBefore(next, section);
+                        }
+                    });
+                }
+            }
+            
+            // Add a new item to a section
+            function addNewItem(section) {
+                console.log('Adding new item to section');
+                const itemsContainer = section.querySelector('.items-container');
+                const sectionType = section.querySelector('.section-type').value;
+                
+                if (!itemsContainer) {
+                    console.error('Items container not found in section');
+                    return;
+                }
+                
+                let itemTemplateId = 'word-item-template';
+                
+                // Choose template based on section type
+                switch(sectionType) {
+                    case 'passage':
+                        itemTemplateId = 'passage-item-template';
+                        break;
+                    case 'sentences':
+                        itemTemplateId = 'sentence-item-template';
+                        break;
+                    case 'letters':
+                        itemTemplateId = 'letter-item-template';
+                        break;
+                    default: // words
+                        itemTemplateId = 'word-item-template';
+                }
+                
+                const itemTemplate = document.getElementById(itemTemplateId);
+                if (!itemTemplate) {
+                    console.error('Item template not found:', itemTemplateId);
+                    return;
+                }
+                
+                const itemElement = document.importNode(itemTemplate.content, true);
+                const itemCard = itemElement.querySelector('.item-card');
+                
+                if (itemCard) {
+                    itemCard.dataset.itemId = `item-${Date.now()}`;
+                    
+                    // Add delete functionality
+                    const deleteBtn = itemCard.querySelector('.delete-item');
+                    if (deleteBtn) {
+                        deleteBtn.addEventListener('click', () => {
+                            itemCard.remove();
+                        });
+                    }
+                    
+                    // Add move up/down functionality
+                    const moveUpBtn = itemCard.querySelector('.move-item-up');
+                    const moveDownBtn = itemCard.querySelector('.move-item-down');
+                    
+                    if (moveUpBtn) {
+                        moveUpBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const prev = itemCard.previousElementSibling;
+                            if (prev) {
+                                itemsContainer.insertBefore(itemCard, prev);
+                            }
+                        });
+                    }
+                    
+                    if (moveDownBtn) {
+                        moveDownBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const next = itemCard.nextElementSibling;
+                            if (next) {
+                                itemsContainer.insertBefore(next, itemCard);
+                            }
+                        });
+                    }
+                    
+                    itemsContainer.appendChild(itemElement);
+                    
+                    // Focus the first input in the new item
+                    const firstInput = itemCard.querySelector('input, textarea');
+                    if (firstInput) {
+                        setTimeout(() => firstInput.focus(), 0);
+                    }
                 }
             }
             
@@ -401,81 +801,191 @@
                 showNotification('Preview functionality coming soon!', 'info');
             }
             
+            // Show a loading state on the publish button
+            function setPublishButtonLoading(isLoading) {
+                const publishBtn = document.querySelector('.publish-btn');
+                if (publishBtn) {
+                    if (isLoading) {
+                        publishBtn.disabled = true;
+                        publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+                    } else {
+                        publishBtn.disabled = false;
+                        publishBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Publish Test';
+                    }
+                }
+            }
+
             // Publish the test
             async function publishTest() {
+                const publishBtn = document.querySelector('.publish-btn');
                 try {
+                    console.log('Starting test publication...');
+                    setPublishButtonLoading(true);
+                    showNotification('Publishing test...', 'info');
+                    
+                    // Get the test data
                     const testData = getTestData();
-                    testData.status = 'published';
-                    testData.publishedAt = serverTimestamp();
-                    testData.updatedAt = serverTimestamp();
+                    console.log('Test data prepared:', JSON.stringify(testData, null, 2));
                     
-                    const user = auth.currentUser;
-                    
-                    if (!user) {
-                        throw new Error('User not authenticated');
+                    // Validate test data
+                    if (!testData.title || testData.title.trim() === '') {
+                        throw new Error('Please enter a test title');
                     }
                     
-                    // Add the user ID to the test data
-                    testData.teacherId = user.uid;
-                    
-                    let docRef;
-                    
-                    if (testData.id) {
-                        // Update existing test
-                        await updateDoc(doc(db, 'tests', testData.id), testData);
-                        docRef = testData.id;
-                    } else {
-                        // Create new test
-                        docRef = await addDoc(collection(db, 'tests'), testData);
+                    if (testData.sections.length === 0) {
+                        throw new Error('Please add at least one section to the test');
                     }
                     
-                    showNotification('Test published successfully!', 'success');
+                    // Validate sections and items
+                    for (const section of testData.sections) {
+                        if (!section.items || section.items.length === 0) {
+                            throw new Error(`Section "${section.title || 'Untitled Section'}" has no items`);
+                        }
+                        
+                        // Validate items based on type
+                        for (const item of section.items) {
+                            if (item.type === 'letter' && !item.content) {
+                                throw new Error('Letter items must have content');
+                            }
+                            if (item.type === 'word' && (!item.content || !item.answer)) {
+                                throw new Error('Word items must have both content and answer');
+                            }
+                        }
+                    }
                     
-                    // Redirect to dashboard after a short delay
-                    setTimeout(() => {
-                        window.location.href = 'teacher-dashboard.html';
-                    }, 1500);
+                    // Prepare test data for Firestore
+                    const testToSave = {
+                        title: testData.title.trim(),
+                        description: (testData.description || '').trim(),
+                        grade: testData.grade || '',
+                        subject: testData.subject || 'Reading',
+                        status: 'published',
+                        createdBy: localStorage.getItem('userType') || 'teacher',
+                        createdByEmail: localStorage.getItem('userEmail') || 'teacher@example.com',
+                        isActive: true,
+                        version: '1.0.0',
+                        sections: testData.sections || [],
+                        // Use Firestore server-side timestamps
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp(),
+                        publishedAt: serverTimestamp()
+                    };
                     
-                    return docRef.id || docRef;
+                    console.log('Saving test to Firestore...', testToSave);
+                    
+                    try {
+                        // Save to Firestore with error handling
+                        const testsCollection = collection(db, 'tests');
+                        console.log('Collection reference created');
+                        
+                        const docRef = await addDoc(testsCollection, testToSave);
+                        console.log('Test saved with ID:', docRef.id);
+                        
+                        // Show success message
+                        showNotification('Test published successfully!', 'success');
+                        
+                        // Show a more prominent success message
+                        const successModal = document.createElement('div');
+                        successModal.className = 'success-modal';
+                        successModal.innerHTML = `
+                            <div class="success-content">
+                                <div class="success-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <h3>Test Published Successfully!</h3>
+                                <p>Your test has been published and is now available for students.</p>
+                                <button id="continue-btn" class="btn btn-primary">Continue to Dashboard</button>
+                            </div>
+                        `;
+                        document.body.appendChild(successModal);
+                        
+                        // Add click handler for the continue button
+                        document.getElementById('continue-btn').addEventListener('click', () => {
+                            window.location.href = 'teacher-dashboard.html';
+                        });
+                        
+                        return docRef.id;
+                    } catch (firestoreError) {
+                        console.error('Firestore error:', firestoreError);
+                        
+                        // Check for common Firestore errors
+                        if (firestoreError.code === 'permission-denied') {
+                            throw new Error('Permission denied. Please check your Firestore security rules.');
+                        } else if (firestoreError.code === 'unavailable') {
+                            throw new Error('Unable to connect to the server. Please check your internet connection.');
+                        } else {
+                            throw new Error(`Failed to save test: ${firestoreError.message}`);
+                        }
+                    }
                 } catch (error) {
                     console.error('Error publishing test:', error);
-                    showNotification('Failed to publish test: ' + error.message, 'error');
+                    showNotification('Error: ' + error.message, 'error');
+                    setPublishButtonLoading(false);
                     throw error;
                 }
             }
             
             // Get all test data as an object
             function getTestData() {
+                // Only include primitive types and arrays/objects of primitive types
+                // Firestore doesn't support custom class instances or undefined values
                 const testData = {
                     title: document.getElementById('test-title')?.value || 'Untitled Test',
                     description: document.getElementById('test-description')?.value || '',
                     grade: document.getElementById('test-grade')?.value || '',
-                    subject: document.getElementById('test-subject')?.value || '',
+                    subject: document.getElementById('test-subject')?.value || 'Reading',
                     sections: [],
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
+                    createdBy: localStorage.getItem('userType') || 'teacher',
+                    // Note: We'll let Firestore handle the timestamps when saving
                 };
                 
                 // Add sections data
                 const sections = document.querySelectorAll('.section-card');
                 sections.forEach((section, index) => {
+                    const sectionType = section.querySelector('.section-type')?.value || 'words';
                     const sectionData = {
-                        id: section.dataset.sectionId || `section-${index + 1}`,
+                        id: section.dataset.sectionId || `section-${Date.now()}-${index}`,
                         title: section.querySelector('.section-title-input')?.value || `Section ${index + 1}`,
-                        type: section.querySelector('.section-type')?.value || 'words',
+                        type: sectionType,
                         instructions: section.querySelector('.section-instructions')?.value || '',
                         items: []
                     };
                     
                     // Add items data
-                    const items = section.querySelectorAll('.test-item');
+                    const items = section.querySelectorAll('.item-card');
                     items.forEach(item => {
+                        const itemType = item.dataset.itemType || sectionType;
+                        const itemContent = item.querySelector('.item-text')?.value || 
+                                         item.querySelector('.item-content')?.value || '';
+                        
+                        // Skip empty items
+                        if (itemType === 'letter' && itemContent.trim() === '') {
+                            return; // Skip this item
+                        }
+                        
                         const itemData = {
-                            id: item.dataset.itemId || `item-${Date.now()}`,
-                            type: sectionData.type,
-                            content: item.querySelector('.item-content')?.value || '',
-                            answer: item.querySelector('.item-answer')?.value || ''
+                            id: item.dataset.itemId || `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                            type: itemType,
+                            content: itemContent,
+                            points: parseInt(item.querySelector('.item-points')?.value) || 1,
+                            // Common fields for all item types
+                            ...(itemType === 'letter' && {
+                                example: item.querySelector('.item-example')?.value || ''
+                            }),
+                            ...(itemType === 'sentence' && {
+                                focusWord: item.querySelector('.item-focus')?.value || ''
+                            }),
+                            ...(itemType === 'passage' && {
+                                title: item.querySelector('.item-title')?.value || '',
+                                question: item.querySelector('.item-question')?.value || ''
+                            })
                         };
+                        
+                        // For word items, use the content as the answer if no specific answer field
+                        if (itemType === 'word' && !itemData.answer) {
+                            itemData.answer = itemContent;
+                        }
+                        
                         sectionData.items.push(itemData);
                     });
                     
@@ -500,10 +1010,6 @@
                     notification.remove();
                 }, 3000);
             }
-            
-            // Auth state is now handled at the top of the DOMContentLoaded
-            
-        });
     </script>
 </body>
 </html>
