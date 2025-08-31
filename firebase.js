@@ -65,21 +65,7 @@ const microsoftProvider = new OAuthProvider('microsoft.com');
 export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
 export const signInWithMicrosoft = () => signInWithPopup(auth, microsoftProvider);
 
-// User management functions
-export const createUserProfile = async (userId, userData) => {
-    try {
-        const userRef = doc(db, 'users', userId);
-        await setDoc(userRef, {
-            ...userData,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-        });
-        return true;
-    } catch (error) {
-        console.error('Error creating user profile:', error);
-        throw error;
-    }
-};
+// User management functions - Single implementation that handles both basic and role-specific profiles
 
 export const getUserProfile = async (userId) => {
     try {

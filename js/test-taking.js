@@ -46,14 +46,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check authentication
     const user = auth.currentUser;
     if (!user) {
-        window.location.href = 'login.html';
+        window.location.href = '/auth/login-fixed.html';
         return;
     }
 
     // Set up auth state observer
     auth.onAuthStateChanged((user) => {
         if (!user) {
-            window.location.href = 'login.html';
+            window.location.href = '/auth/login-fixed.html';
         }
     });
 

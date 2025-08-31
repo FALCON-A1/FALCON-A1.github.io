@@ -27,61 +27,146 @@ const db = getFirestore(app);
 
 // Initialize the teacher dashboard when the DOM is loaded
 document.addEventListener('DOMContentLoaded', async function() {
-    // Check if user is authenticated and is a teacher
-    const { user, userData } = await checkAuth();
-    if (!user) {
-        window.location.href = '/auth/login.html';
-        return;
-    }
+    try {
+        // Check if user is authenticated and is a teacher
+        const authResult = await checkAuth();
+        if (!authResult || !authResult.user) {
+            window.location.href = '/auth/login-fixed.html';
+            return;
+        }
 
-    // Initialize the dashboard
-    await initTeacherDashboard(user.uid, userData);
-    
-    // Set up real-time updates
-    setupRealtimeUpdates(user.uid);
+        const { user, userData } = authResult;
+        
+        // Initialize the dashboard
+        await initTeacherDashboard(user.uid, userData);
+        
+        // Set up real-time updates
+        setupRealtimeUpdates(user.uid);
+    } catch (error) {
+        console.error('Error initializing dashboard:', error);
+        showError('Failed to initialize dashboard. Please refresh the page.');
+    }
 });
 
 // Check if user is authenticated and get user data
 async function checkAuth() {
     try {
+        console.log('Starting auth check...');
+        
         // Wait for auth state to be determined
-        const user = await new Promise((resolve) => {
-            const unsubscribe = onAuthStateChanged(auth, (user) => {
-                unsubscribe();
-                resolve(user);
-            });
+        const user = await new Promise((resolve, reject) => {
+            const unsubscribe = onAuthStateChanged(auth, 
+                (user) => {
+                    console.log('Auth state changed:', user ? 'User signed in' : 'No user');
+                    unsubscribe();
+                    resolve(user);
+                },
+                (error) => {
+                    console.error('Auth state error:', error);
+                    unsubscribe();
+                    reject(error);
+                },
+                () => {
+                    console.log('Auth state observer completed');
+                    unsubscribe();
+                }
+            );
         });
 
         if (!user) {
-            window.location.href = '/auth/login.html';
+            console.log('No authenticated user found, redirecting to login');
+            window.location.href = '/auth/login-fixed.html';
             return null;
         }
 
-        // Get user profile to check role
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (!userDoc.exists() || userDoc.data().role !== 'teacher') {
-            window.location.href = '/dashboard.html';
+        console.log('Authenticated user:', user.uid);
+        
+        try {
+            console.log('1. Getting Firestore document reference...');
+            
+            // Verify Firestore is properly initialized
+            if (!db) {
+                console.error('Firestore not initialized. db is:', db);
+                throw new Error('Firestore not initialized');
+            }
+            
+            console.log('1.1. Firestore instance:', db);
+            console.log('1.2. User UID:', user.uid);
+            
+            const teacherDocRef = doc(db, 'teacher', user.uid);
+            console.log('2. Document reference created for teacher collection:', teacherDocRef);
+            
+            console.log('3. Fetching teacher document from Firestore...');
+            try {
+                const teacherDoc = await getDoc(teacherDocRef);
+                console.log('4. Document fetch complete. Exists:', teacherDoc.exists());
+                
+                if (!teacherDoc.exists()) {
+                console.error('5. No teacher document found for UID:', user.uid);
+                console.log('6. Available collections in Firestore:');
+                
+                try {
+                    const collections = await getDocs(collection(db, '/'));
+                    console.log('6.1. Collections in root:');
+                    collections.forEach((col) => {
+                        console.log('   -', col.id);
+                    });
+                    
+                    // Try to list documents in the teacher collection
+                    try {
+                        const teacherDocs = await getDocs(collection(db, 'teacher'));
+                        console.log('6.2. Documents in teacher collection:');
+                        teacherDocs.forEach((doc) => {
+                            console.log('   -', doc.id, '=>', doc.data());
+                        });
+                    } catch (teacherError) {
+                        console.error('Error listing teacher documents:', teacherError);
+                    }
+                } catch (colError) {
+                    console.error('Error listing collections:', colError);
+                }
+                
+                showError('Your teacher profile could not be found. Please contact support.');
+                return null;
+            }
+            
+            const userData = teacherDoc.data();
+            console.log('5. Teacher data retrieved:', userData);
+            console.log('6. User type:', userData.userType || 'not specified');
+            
+            if (userData.userType !== 'teacher') {
+                console.log('7. User is not a teacher, redirecting to student dashboard');
+                window.location.href = '/dashboard.html';
+                return null;
+            }
+
+            // Update UI with teacher's name
+            const teacherNameElement = document.getElementById('teacher-name');
+            if (teacherNameElement) {
+                // Use the 'name' field from the teacher document
+                teacherNameElement.textContent = userData.name || 'Teacher';
+            }
+            
+            // Update welcome message
+            const welcomeMessage = document.querySelector('.welcome-section .lead');
+            if (welcomeMessage) {
+                // Use the 'name' field for the welcome message
+                const teacherName = userData.name ? userData.name.split(' ')[0] : 'Teacher';
+                welcomeMessage.textContent = `Here's what's happening with your classes today, ${teacherName}.`;
+            }
+
+            return { user, userData };
+            
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            showError('Failed to load your profile data. Please try again later.');
             return null;
         }
-
-        const userData = userDoc.data();
         
-        // Update UI with teacher's name
-        const teacherNameElement = document.getElementById('teacher-name');
-        if (teacherNameElement) {
-            teacherNameElement.textContent = userData.displayName || userData.name || 'Teacher';
-        }
-        
-        // Update welcome message
-        const welcomeMessage = document.querySelector('.welcome-section .lead');
-        if (welcomeMessage) {
-            welcomeMessage.textContent = `Here's what's happening with your classes today, ${userData.firstName || 'Teacher'}.`;
-        }
-
-        return { user, userData };
     } catch (error) {
         console.error('Auth check failed:', error);
-        showError('Failed to load your dashboard. Please try again.');
+        showError('Authentication error. Please log in again.');
+        window.location.href = '/auth/login-fixed.html';
         return null;
     }
 }
@@ -89,15 +174,37 @@ async function checkAuth() {
 // Initialize the teacher dashboard
 async function initTeacherDashboard(teacherId, userData) {
     try {
-        // Update teacher's name in the UI
-        updateTeacherProfile(userData);
+        console.log('Initializing teacher dashboard for:', teacherId, userData);
+        
+        // Show loading state
+        const welcomeMessage = document.getElementById('welcome-message');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (welcomeMessage) welcomeMessage.textContent = 'Loading your dashboard...';
+        if (loadingIndicator) loadingIndicator.style.display = 'block';
+        
+        // Update teacher's name in the UI first
+        if (userData) {
+            console.log('Updating teacher profile with data:', userData);
+            updateTeacherProfile(userData);
+        } else {
+            console.warn('No user data provided to initTeacherDashboard');
+            // Try to get user data from Firestore if not provided
+            try {
+                const userDoc = await getDoc(doc(db, 'users', teacherId));
+                if (userDoc.exists()) {
+                    updateTeacherProfile(userDoc.data());
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        }
         
         // Load all dashboard components
         await Promise.all([
-            loadClassStats(teacherId),
-            loadRecentTests(teacherId),
-            loadStudentList(teacherId),
-            setupEventListeners(teacherId)
+            loadClassStats(teacherId).catch(console.error),
+            loadRecentTests(teacherId).catch(console.error),
+            loadStudentList(teacherId).catch(console.error),
+            setupEventListeners(teacherId).catch(console.error)
         ]);
         
         // Update UI to show dashboard is ready
@@ -385,7 +492,7 @@ function setupEventListeners(teacherId) {
     document.getElementById('logout-btn').addEventListener('click', async () => {
         try {
             await window.alphariaFirebase.signOut(window.alphariaFirebase.auth);
-            window.location.href = '/auth/login.html';
+            window.location.href = '/auth/login-fixed.html';
         } catch (error) {
             console.error('Logout failed:', error);
             showError('Failed to log out');
@@ -575,24 +682,82 @@ function setupRealtimeUpdates(teacherId) {
 
 // Update teacher profile in the UI
 function updateTeacherProfile(userData) {
-    // Update welcome message
+    if (!userData) {
+        console.warn('No user data provided to updateTeacherProfile');
+        return;
+    }
+    
+    console.log('Updating teacher profile with data:', userData);
+    
+    // Get the best available name (check multiple possible fields)
+    const getName = () => {
+        if (userData.name) return userData.name;
+        if (userData.displayName) return userData.displayName;
+        if (userData.firstName) {
+            return userData.lastName 
+                ? `${userData.firstName} ${userData.lastName}`
+                : userData.firstName;
+        }
+        if (userData.email) return userData.email.split('@')[0];
+        return 'Teacher';
+    };
+    
+    const teacherName = getName();
+    const firstName = teacherName.split(' ')[0];
+    
+    // Update welcome message with teacher's name
     const teacherNameElement = document.getElementById('teacher-name');
     if (teacherNameElement) {
-        const name = userData.name || userData.displayName?.split(' ')[0] || 'Teacher';
-        teacherNameElement.textContent = name;
+        teacherNameElement.textContent = teacherName;
     }
     
     // Update the welcome message text
-    const welcomeMessage = document.querySelector('.welcome-section .lead');
+    const welcomeMessage = document.getElementById('welcome-message');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    
     if (welcomeMessage) {
-        const name = userData.name || userData.displayName?.split(' ')[0] || 'Teacher';
-        welcomeMessage.textContent = `Here's what's happening with your classes today, ${name}.`;
+        welcomeMessage.textContent = `Here's what's happening with your classes today, ${firstName}.`;
+        welcomeMessage.style.display = 'block';
+    }
+    
+    // Hide loading indicator when data is loaded
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
     }
     
     // Update profile picture if available
-    const profilePic = document.querySelector('.user-profile .avatar');
-    if (profilePic && userData.photoURL) {
-        profilePic.innerHTML = `<img src="${userData.photoURL}" alt="${userData.firstName || 'Teacher'}">`;
+    const avatar = document.querySelector('.user-avatar img');
+    if (avatar) {
+        if (userData.photoURL) {
+            avatar.src = userData.photoURL;
+            avatar.alt = teacherName;
+            avatar.title = teacherName;
+            avatar.style.display = 'block';
+        } else {
+            // Generate a default avatar with initials if no photoURL is available
+            const initials = teacherName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            avatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(teacherName)}&background=random&color=fff&size=128`;
+            avatar.alt = `${teacherName}'s avatar`;
+            avatar.title = teacherName;
+            avatar.style.display = 'block';
+        }
+    }
+    
+    // Update any other profile elements that might exist
+    const profileNameElements = document.querySelectorAll('.profile-name');
+    profileNameElements.forEach(el => {
+        el.textContent = teacherName;
+    });
+    
+    // Update email if available
+    if (userData.email) {
+        const emailElements = document.querySelectorAll('.profile-email');
+        emailElements.forEach(el => {
+            el.textContent = userData.email;
+            if (el.href && el.href.startsWith('mailto:')) {
+                el.href = `mailto:${userData.email}`;
+            }
+        });
     }
 }
 

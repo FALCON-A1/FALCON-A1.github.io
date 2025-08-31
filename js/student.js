@@ -48,7 +48,7 @@ function loadUserData() {
             loadStudentData(user.uid);
         } else {
             // Redirect to login if not authenticated
-            window.location.href = 'login.html';
+            window.location.href = '/auth/login-fixed.html';
         }
     });
 }

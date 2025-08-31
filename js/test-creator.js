@@ -17,7 +17,7 @@ export function initTestCreator() {
     const user = window.auth.currentUser;
     if (!user) {
         // Redirect to login if not authenticated
-        window.location.href = 'login.html';
+        window.location.href = '/auth/login-fixed.html';
         return;
     }
     // DOM Elements

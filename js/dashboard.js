@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Check authentication state and redirect if not logged in
 function checkAuthState() {
     const currentPath = window.location.pathname;
-    const isAuthPage = currentPath.includes('login.html') || 
+    const isAuthPage = currentPath.includes('login-fixed.html') || 
                       currentPath.includes('signup.html') || 
                       currentPath.includes('forgot-password.html') ||
                       currentPath.endsWith('index.html') || 
@@ -68,7 +68,7 @@ function checkAuthState() {
     
     // Redirect to login if not authenticated and not on auth page
     if (!auth.currentUser && !isAuthPage) {
-        window.location.href = 'auth/login.html';
+        window.location.href = '/auth/login-fixed.html';
         return false;
     }
     
@@ -100,7 +100,7 @@ function initializeAuthState() {
             updateUI();
         } else {
             // Redirect to login if not authenticated
-            window.location.href = 'login.html';
+            window.location.href = '/auth/login-fixed.html';
         }
     });
 }

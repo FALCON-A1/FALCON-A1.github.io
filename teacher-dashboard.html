@@ -17,13 +17,15 @@
 <body class="teacher-dashboard">
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
+                <i class="fas fa-brain logo-icon"></i>
                 <h2>Alpharia</h2>
             </div>
             
-            <nav>
-                <ul class="nav-menu">
+            <nav class="nav-menu">
+                <h3 class="menu-title">Menu</h3>
+                <ul>
                     <li class="nav-item">
                         <a href="teacher-dashboard.html" class="nav-link active">
                             <i class="fas fa-tachometer-alt"></i>
@@ -37,25 +39,47 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-book"></i>
+                            <span>My Tests</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="teacher-progress.html" class="nav-link">
                             <i class="fas fa-chart-line"></i>
                             <span>Progress</span>
                         </a>
                     </li>
+                </ul>
+
+                <h3 class="menu-title">Account</h3>
+                <ul>
                     <li class="nav-item">
                         <a href="teacher-settings.html" class="nav-link">
                             <i class="fas fa-cog"></i>
                             <span>Settings</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Help</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
             
             <div class="sidebar-footer">
-                <button id="logout-btn" class="btn btn-logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </button>
+                <div class="user-profile">
+                    <img src="" alt="User Avatar" class="user-avatar" id="user-avatar-sidebar">
+                    <div class="user-info">
+                        <h4 class="user-name" id="sidebar-teacher-name">Teacher</h4>
+                        <p class="user-role">Teacher</p>
+                    </div>
+                    <button class="sign-out" id="logout-btn" title="Sign Out">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
             </div>
         </aside>
         
@@ -94,8 +118,14 @@
                 <section class="welcome-section">
                     <div class="card">
                         <div class="card-body">
-                            <h1>Welcome back, <span class="text-primary" id="teacher-name">Teacher</span>!</h1>
-                            <p class="lead">Loading your dashboard...</p>
+                            <div id="welcome-content">
+                                <h1>Welcome back, <span class="text-primary" id="teacher-name">Loading...</span>!</h1>
+                                <p class="lead" id="welcome-message">Loading your dashboard...</p>
+                                <div id="loading-indicator" class="loading-spinner">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -150,75 +180,15 @@
                         <a href="#view-all" class="btn btn-link">View All</a>
                     </div>
                     <div class="card-body">
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-file-alt"></i>
-                            </div>
-                            <div class="activity-details">
-                                <h4>PRE-TEST - Reading test</h4>
-                                <p>24/30 submissions graded</p>
-                                <small>Due: Aug 30, 2025</small>
-                            </div>
-                            <div class="activity-actions">
-                                <button class="btn btn-outline btn-sm">Grade</button>
-                                <button class="btn btn-link btn-sm">View Results</button>
-                            </div>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-file-alt"></i>
-                            </div>
-                            <div class="activity-details">
-                                <h4>POST-TEST - Reading test</h4>
-                                <p>15/25 submissions received</p>
-                                <small>Due: Sep 15, 2025</small>
-                            </div>
-                            <div class="activity-actions">
-                                <button class="btn btn-outline btn-sm">Grade</button>
-                                <button class="btn btn-link btn-sm">View Results</button>
-                            </div>
+                        <div id="recent-tests-container">
+                            <p id="no-tests-message">No recent tests found.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Upcoming Classes -->
-                <div class="classes-grid">
-                    <div class="class-card">
-                        <div class="class-header">
-                            <h4>PRE-TEST - Reading test</h4>
-                            <span class="class-time">Mon, Wed, Fri • 9:00 AM</span>
-                        </div>
-                        <div class="class-body">
-                            <div class="class-meta">
-                                <span>25 Students</span>
-                                <span>3 Assignments Due</span>
-                            </div>
-                            <p>Speech Recognition reading test.</p>
-                            <div class="class-actions">
-                                <button class="btn btn-primary btn-sm">View Class</button>
-                                <button class="btn btn-outline btn-sm">Message Students</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="class-card">
-                        <div class="class-header">
-                            <h4>POST-TEST - Reading test</h4>
-                            <span class="class-time">Tue, Thu • 11:00 AM</span>
-                        </div>
-                        <div class="class-body">
-                            <div class="class-meta">
-                                <span>18 Students</span>
-                                <span>1 Assignment Due</span>
-                            </div>
-                            <p>Speech Recognition reading test.</p>
-                            <div class="class-actions">
-                                <button class="btn btn-primary btn-sm">View Class</button>
-                                <button class="btn btn-outline btn-sm">Message Students</button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="classes-grid" id="upcoming-classes-container">
+                    <p id="no-classes-message">No upcoming classes found.</p>
                 </div>
             </div>
         </main>
@@ -259,10 +229,416 @@
         </div>
     </div>
     
-    <!-- Firebase SDK -->
-    <script type="module" src="/firebase.js"></script>
+    <!-- Firebase SDK and Teacher Dashboard Scripts -->
+    <script type="module" src="./firebase.js"></script>
+    <script type="module" src="./js/teacher-dashboard.js"></script>
     
-    <!-- Teacher Dashboard Script -->
-    <script type="module" src="/js/teacher-dashboard.js"></script>
+    <!-- Initialize the dashboard -->
+    <script type="module">
+        // Import Firebase modules
+        import { app, auth, db } from './firebase.js';
+        
+        // Import Auth functions directly from CDN
+        import { 
+            onAuthStateChanged, 
+            setPersistence, 
+            browserLocalPersistence, 
+            signOut
+        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
+        
+        // Import Firestore functions
+        import { doc, getDoc, collection, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
+        
+        async function fetchAndDisplayRecentTests(teacherId) {
+            console.log('Fetching recent tests for teacher:', teacherId);
+            const testsContainer = document.getElementById('recent-tests-container');
+            const noTestsMessage = document.getElementById('no-tests-message');
+
+            if (!testsContainer) {
+                console.error('Test container element not found in the DOM.');
+                return;
+            }
+
+            try {
+                const testsRef = collection(db, 'tests');
+                const q = query(testsRef, where('teacherId', '==', teacherId), orderBy('createdAt', 'desc'), limit(5));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    console.log('No recent tests found for this teacher.');
+                    if(noTestsMessage) noTestsMessage.style.display = 'block';
+                    testsContainer.innerHTML = ''; // Clear any existing content
+                } else {
+                    if(noTestsMessage) noTestsMessage.style.display = 'none';
+                    testsContainer.innerHTML = ''; // Clear the message
+                    
+                    querySnapshot.forEach(doc => {
+                        const test = doc.data();
+                        const testId = doc.id;
+                        
+                        const createdAt = test.createdAt.toDate();
+                        const formattedDate = createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                        const testCardHTML = `
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <h4>${test.title || 'Untitled Test'}</h4>
+                                    <p>${test.questions ? test.questions.length : 0} questions</p>
+                                    <small>Created: ${formattedDate}</small>
+                                </div>
+                                <div class="activity-actions">
+                                    <a href="view-test.html?testId=${testId}" class="btn btn-outline btn-sm">View</a>
+                                    <a href="#" class="btn btn-link btn-sm">Results</a>
+                                </div>
+                            </div>
+                        `;
+                        testsContainer.insertAdjacentHTML('beforeend', testCardHTML);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching recent tests:', error);
+                testsContainer.innerHTML = '<p>Error loading tests. Please try again later.</p>';
+            }
+        }
+
+        console.log('Firebase services imported from firebase.js');
+        
+        // Set auth persistence to LOCAL to prevent sign-out on refresh
+        
+        // Configure auth persistence
+        setPersistence(auth, browserLocalPersistence)
+            .then(() => {
+                console.log('Auth persistence set to LOCAL');
+            })
+            .catch((error) => {
+                console.error('Error setting auth persistence:', error);
+            });
+        
+        // Check auth state and initialize dashboard
+        console.log('Checking auth state...');
+        let isInitializing = false;
+        // Logout Functionality
+        const logoutButton = document.getElementById('logout-btn');
+        
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                console.log('User signed out successfully.');
+                window.location.href = 'auth/login-fixed.html';
+            } catch (error) {
+                console.error('Error signing out:', error);
+                alert('Failed to sign out. Please try again.');
+            }
+        }
+
+        if (logoutButton) {
+            logoutButton.addEventListener('click', handleLogout);
+        }
+
+        // Initialize auth state listener
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            // If we're already initializing, ignore this callback
+            if (isInitializing) {
+                console.log('Auth state change already being handled, skipping...');
+                return;
+            }
+            
+            // Handle user not signed in
+            if (!user) {
+                console.log('No user signed in, redirecting to login...');
+                window.location.href = 'auth/login-fixed.html';
+                return;
+            }
+            
+            try {
+                isInitializing = true;
+                
+                console.log('User is signed in:', {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName
+                });
+                
+                // Initialize dashboard with user data
+                console.log('Fetching user document from Firestore...');
+                
+                try {
+                    console.log('1. Starting user data fetch...');
+                    
+                    // Method 1: Try to get user document from 'users' collection
+                    console.log('2. Trying to get user document...');
+                    
+                    // Ensure db is properly initialized
+                    if (!db) {
+                        throw new Error('Firestore database is not initialized');
+                    }
+                    
+                    const userDocRef = doc(db, 'users', user.uid);
+                    console.log('3. Document reference created for users collection:', userDocRef);
+                    
+                    let userData = null;
+                    
+                    // Try getting user document
+                    try {
+                        console.log('4. Fetching user document...');
+                        const userDoc = await getDoc(userDocRef);
+                        
+                        if (userDoc.exists()) {
+                            userData = userDoc.data();
+                            console.log('5. User document found:', JSON.stringify(userData, null, 2));
+                        } else {
+                            console.log('5. User document not found in users collection');
+                        }
+                    } catch (userError) {
+                        console.warn('Error fetching user document:', userError);
+                    }
+                    
+                    // If user data not found in users collection, try teachers collection
+                    if (!userData) {
+                        console.log('6. Trying to get teacher document...');
+                        const teacherDocRef = doc(db, 'teachers', user.uid);
+                        console.log('7. Document reference created for teachers collection');
+                        
+                        try {
+                            console.log('8. Fetching teacher document...');
+                            const teacherDoc = await getDoc(teacherDocRef);
+                            
+                            if (teacherDoc.exists()) {
+                                userData = teacherDoc.data();
+                                console.log('9. Teacher document found:', JSON.stringify(userData, null, 2));
+                            } else {
+                                console.log('9. Teacher document not found');
+                            }
+                        } catch (teacherError) {
+                            console.warn('Error fetching teacher document:', teacherError);
+                        }
+                    }
+                    
+                    // If we have user data, update the UI
+                    if (userData) {
+                        console.log('10. Updating UI with user data');
+                        const teacherName = userData.displayName || userData.name || 'Teacher';
+                        console.log('11. Setting teacher name to:', teacherName);
+                        
+                        // Safely update the UI
+                        document.getElementById('teacher-name').textContent = teacherName;
+                        document.getElementById('sidebar-teacher-name').textContent = teacherName;
+                        
+                        const avatarURL = user.photoURL;
+                        if (avatarURL) {
+                            document.getElementById('user-avatar').src = avatarURL;
+                            document.getElementById('user-avatar-sidebar').src = avatarURL;
+                        }
+                        
+                        const welcomeMessage = document.getElementById('welcome-message');
+                        if (welcomeMessage) {
+                            welcomeMessage.textContent = `Welcome to your dashboard, ${teacherName.split(' ')[0]}!`;
+                            welcomeMessage.style.display = 'block';
+                        }
+                        const loadingIndicator = document.getElementById('loading-indicator');
+                        if (loadingIndicator) loadingIndicator.style.display = 'none';
+
+                        // Fetch and display recent tests
+                        await fetchAndDisplayRecentTests(user.uid);
+                        
+                        console.log('12. UI updated successfully');
+                        
+                        // Fetch teacher's tests
+                        fetchTeacherTests(user.uid);
+                        
+                        return;
+                    }
+                    
+                    // If we get here, no document was found
+                    console.error('18. User document not found in Firestore');
+                    
+                    // Show error message to user
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'alert alert-danger';
+                    errorMessage.textContent = 'Error: Could not load your profile data. Please contact support.';
+                    
+                    const welcomeSection = document.querySelector('.welcome-section .card-body');
+                    if (welcomeSection) {
+                        welcomeSection.prepend(errorMessage);
+                    }
+                    
+                } catch (error) {
+                    console.error('ERROR CAUGHT:', {
+                        name: error.name,
+                        message: error.message,
+                        stack: error.stack,
+                        code: error.code,
+                        details: error
+                    });
+                    
+                    // Show error message to user
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'alert alert-danger';
+                    errorMessage.textContent = `Error: ${error.message || 'Could not load your profile data. Please try again later.'}`;
+                    
+                    const welcomeSection = document.querySelector('.welcome-section .card-body');
+                    if (welcomeSection) {
+                        welcomeSection.prepend(errorMessage);
+                    }
+                } finally {
+                    // Always hide the loading indicator
+                    const loadingIndicator = document.getElementById('loading-indicator');
+                    if (loadingIndicator) {
+                        loadingIndicator.style.display = 'none';
+                    }
+                    console.log('19. Loading indicator hidden');
+                }
+                
+                // Update avatar if it exists
+                const avatar = document.querySelector('.user-avatar img');
+                if (avatar) {
+                    if (user.photoURL) {
+                        avatar.src = user.photoURL;
+                    } else {
+                        const name = userData?.name || userData?.displayName || 'T';
+                        avatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
+                    }
+                    avatar.alt = userData?.name || 'Teacher';
+                    avatar.title = userData?.name || 'Teacher';
+                }
+                
+            } catch (error) {
+                console.error('Error initializing dashboard:', error);
+                const welcomeMessage = document.getElementById('welcome-message');
+                if (welcomeMessage) {
+                    welcomeMessage.textContent = 'Error loading dashboard. Please refresh the page.';
+                    welcomeMessage.style.color = '#dc3545';
+                }
+            } finally {
+                isInitializing = false;
+            }
+        });
+        
+        // Function to fetch and display teacher's tests
+        async function fetchTeacherTests(teacherId) {
+            try {
+                console.log('Fetching tests for teacher:', teacherId);
+                
+                // Get all tests created by this teacher, ordered by creation date
+                const testsRef = collection(db, 'tests');
+                const q = query(
+                    testsRef, 
+                    where('teacherId', '==', teacherId),
+                    orderBy('createdAt', 'desc'),
+                    limit(5) // Limit to 5 most recent tests
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const testsContainer = document.querySelector('.card-body');
+                
+                // Clear existing test items
+                testsContainer.innerHTML = '';
+                
+                // Update the total tests count
+                const totalTestsElement = document.querySelector('.quick-stats .stat-card:first-child h3');
+                if (totalTestsElement) {
+                    totalTestsElement.textContent = querySnapshot.size;
+                }
+                
+                if (querySnapshot.empty) {
+                    testsContainer.innerHTML = `
+                        <div class="no-tests">
+                            <i class="fas fa-inbox"></i>
+                            <p>No tests found. Create your first test to get started!</p>
+                        </div>`;
+                    return;
+                }
+                
+                // Create test items for each test
+                querySnapshot.forEach((doc) => {
+                    const test = doc.data();
+                    const testId = doc.id;
+                    const testDate = test.createdAt ? test.createdAt.toDate().toLocaleDateString() : 'No date';
+                    
+                    const testItem = document.createElement('div');
+                    testItem.className = 'activity-item';
+                    testItem.dataset.testId = testId; // Store test ID in dataset
+                    testItem.innerHTML = `
+                        <div class="activity-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>${test.title || 'Untitled Test'}</h4>
+                            <p>${test.sections ? test.sections.length : 0} sections</p>
+                            <small>Created: ${testDate}</small>
+                        </div>
+                        <div class="activity-actions">
+                            <button class="btn btn-outline btn-sm view-test" data-test-id="${testId}">
+                                View
+                            </button>
+                            <button class="btn btn-link btn-sm view-results" data-test-id="${testId}">
+                                Results
+                            </button>
+                        </div>`;
+                    
+                    testsContainer.appendChild(testItem);
+                });
+                
+            } catch (error) {
+                console.error('Error fetching tests:', error);
+                const testsContainer = document.querySelector('.card-body');
+                if (testsContainer) {
+                    testsContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            Error loading tests. Please refresh the page.
+                        </div>`;
+                }
+            }
+        }
+        
+        // Add these functions for the view buttons
+        function viewTest(testId) {
+            // Navigate to view test page with testId
+            window.location.href = `view-test.html?id=${testId}`;
+        }
+        
+        function viewResults(testId) {
+            // Navigate to test results page with testId
+            window.location.href = `test-results.html?id=${testId}`;
+        }
+        
+        // Add event delegation for test actions
+        function setupTestEventListeners() {
+            document.addEventListener('click', (e) => {
+                // Handle View Test button clicks
+                if (e.target.closest('.view-test')) {
+                    const button = e.target.closest('.view-test');
+                    const testId = button.dataset.testId;
+                    viewTest(testId);
+                }
+                
+                // Handle View Results button clicks
+                if (e.target.closest('.view-results')) {
+                    const button = e.target.closest('.view-results');
+                    const testId = button.dataset.testId;
+                    viewResults(testId);
+                }
+            });
+        }
+        
+        // Initialize the dashboard when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded');
+            setupTestEventListeners(); // Add event listeners
+            // Any initialization code that needs to run after DOM is loaded
+        });
+        
+        // Clean up the auth state listener when the page unloads
+        window.addEventListener('beforeunload', () => {
+            console.log('Cleaning up auth state listener...');
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        });
+    </script>
+
 </body>
 </html>

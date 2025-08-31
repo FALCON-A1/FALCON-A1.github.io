@@ -334,7 +334,7 @@ function checkAuthState() {
             // User is signed out
             if (!isAuthPage) {
                 // Redirect to login if not on auth page
-                window.location.href = 'auth/login.html';
+                window.location.href = '/auth/login-fixed.html';
             }
         }
     });

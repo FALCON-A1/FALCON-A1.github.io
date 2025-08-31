@@ -341,23 +341,13 @@
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
     <script type="module">
-            // Import the functions you need from the SDKs you need
-        import { 
-            initializeApp,
-            getApp,
-            getApps
-        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        // Import Firebase directly from the SDK
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
         import { 
             getAuth, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            signOut, 
-            onAuthStateChanged, 
-            setPersistence, 
-            browserLocalPersistence,
-            browserSessionPersistence,
-            connectAuthEmulator
-        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+            onAuthStateChanged,
+            signOut 
+        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
         import { 
             getFirestore, 
             collection, 
@@ -369,117 +359,239 @@
             getDocs, 
             query, 
             where, 
-            orderBy, 
-            limit, 
+            orderBy,
+            limit,
             serverTimestamp,
-            connectFirestoreEmulator,
-            enableMultiTabIndexedDbPersistence,
-            CACHE_SIZE_UNLIMITED
-        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+            writeBatch,
+            enableIndexedDbPersistence,
+            addDoc // Adding the missing import
+        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
         
-        // Your web app's Firebase configuration
+        // Initialize Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyD8wzA2bX2jzvJ1wR4X5XwQdQk8cZ6X9Y0",
-            authDomain: "alpharia-12345.firebaseapp.com",
-            projectId: "alpharia-12345",
-            storageBucket: "alpharia-12345.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abc123def456"
+            apiKey: "AIzaSyAtOedXLBC4eigzqmBpYFciN-W5Mi2Cpmc",
+            authDomain: "alpharia-c6a39.firebaseapp.com",
+            projectId: "alpharia-c6a39",
+            storageBucket: "alpharia-c6a39.firebasestorage.app",
+            messagingSenderId: "85322759772",
+            appId: "1:85322759772:web:d5c7a528fd61c9d2373099",
+            measurementId: "G-KEC7MGMVE8"
         };
         
-        // Initialize Firebase in an async function
-        async function initializeFirebaseApp() {
-            try {
-                // Initialize Firebase
-                let app;
-                try {
-                    app = initializeApp(firebaseConfig);
-                    console.log('Firebase app initialized with new instance');
-                } catch (error) {
-                    if (error.code === 'app/duplicate-app') {
-                        // Get the existing app instance
-                        app = getApp();
-                        console.log('Using existing Firebase app instance');
-                    } else {
-                        throw error; // Re-throw other errors
-                    }
-                }
-                
-                // Initialize auth and firestore
-                const auth = getAuth(app);
-                const db = getFirestore(app);
-                
-                // Try to set persistence
-                try {
-                    await setPersistence(auth, browserLocalPersistence);
-                    console.log('Auth persistence set to LOCAL');
-                } catch (e) {
-                    console.warn('Failed to set auth persistence:', e);
-                    // Continue with db even if persistence fails
-                }
-                
-                return { app, auth, db };
-            } catch (error) {
-                console.error('Fatal Firebase initialization error:', error);
-                throw error; // Re-throw the error to be handled by the caller
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Function to log auth state
+        function logAuthState(user) {
+            console.log('Auth State Changed:', user ? 'User is signed in' : 'No user signed in');
+            if (user) {
+                console.log('User UID:', user.uid);
+                console.log('Email:', user.email);
+                console.log('Email Verified:', user.emailVerified);
+                console.log('Auth Persistence:', auth.currentUser ? 'User exists in auth' : 'No user in auth');
             }
         }
         
-        // Initialize Firebase and get the instances
-        const { app, auth, db } = await initializeFirebaseApp();
+        // Enable offline persistence
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code === 'failed-precondition') {
+                console.warn('Offline persistence can only be enabled in one tab at a time.');
+            } else if (err.code === 'unimplemented') {
+                console.warn('The current browser doesn\'t support offline persistence.');
+            }
+        });
+        
+        // Auth state management
+        let currentUser = null;
+        
+        // Update UI when user is signed in
+        function updateUserUI(user) {
+            if (!user) return;
             
-        async function initApp() {
-            try {
-                // Wait for Firebase to be fully initialized
-                await Promise.race([
-                    new Promise(resolve => setTimeout(resolve, 2000)), // Max 2 seconds wait
-                    new Promise(resolve => {
-                        const checkAuth = () => {
-                            if (auth && db) resolve();
-                            else setTimeout(checkAuth, 100);
-                        };
-                        checkAuth();
-                    })
-                ]);
-
-                // Use onAuthStateChanged to properly handle auth state changes
-                return new Promise((resolve) => {
-                    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            console.log('Auth state: User is signed in:', user.email);
-                            // Update UI to show user is signed in
-                            const userAvatar = document.querySelector('.user-avatar img');
-                            if (userAvatar) {
-                                userAvatar.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}`;
-                            }
-                            
-                            // Initialize the test creator only after confirming user is authenticated
-                            initTestCreator();
-                            resolve(true);
-                        } else {
-                            console.log('No user signed in, redirecting to login...');
-                            // Redirect to login page if not authenticated
-                            window.location.href = 'auth/login-fixed.html?redirect=' + encodeURIComponent(window.location.pathname);
-                            resolve(false);
-                        }
-                    });
-                    
-                    // Set a timeout to ensure we don't wait forever
-                    setTimeout(() => {
-                        unsubscribe(); // Clean up the listener
-                        if (!auth.currentUser) {
-                            console.log('Auth check timed out, redirecting to login...');
-                            window.location.href = 'auth/login-fixed.html?redirect=' + encodeURIComponent(window.location.pathname);
-                            resolve(false);
-                        }
-                    }, 3000);
+            console.log('Updating UI for user:', user.email);
+            
+            // Update user avatar
+            const userAvatar = document.querySelector('.user-avatar img');
+            if (userAvatar) {
+                if (user.photoURL) {
+                    userAvatar.src = user.photoURL;
+                } else if (user.displayName) {
+                    userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=random`;
+                } else if (user.email) {
+                    userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}&background=random`;
+                } else {
+                    userAvatar.src = 'https://ui-avatars.com/api/?name=User&background=random';
+                }
+                userAvatar.alt = user.displayName || user.email || 'User';
+                userAvatar.title = user.displayName || user.email || 'User';
+                userAvatar.style.display = 'block';
+            }
+            
+            // Add logout functionality
+            const logoutBtn = document.querySelector('.logout-btn');
+            if (logoutBtn) {
+                // Remove any existing event listeners to prevent duplicates
+                const newLogoutBtn = logoutBtn.cloneNode(true);
+                logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+                
+                newLogoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await signOut(auth);
+                        window.location.href = 'auth/login-fixed.html';
+                    } catch (error) {
+                        console.error('Error signing out:', error);
+                        showNotification('Failed to sign out. Please try again.', 'error');
+                    }
                 });
                 
-            } catch (error) {
-                console.error('Error initializing app:', error);
-                showNotification('Error initializing application. Please refresh the page.', 'error');
-                return false;
+                // Make sure the logout button is visible
+                newLogoutBtn.style.display = 'block';
             }
+        }
+            
+
+        async function initApp() {
+            console.log('Initializing app...');
+            
+            return new Promise((resolve) => {
+                // Check authentication state
+                console.log('Setting up auth state listener...');
+                const unsubscribe = onAuthStateChanged(auth, async (user) => {
+                    try {
+                        console.log('Auth state changed callback triggered');
+                        logAuthState(user);
+                        
+                        if (!user) {
+                            // Redirect to login page with the current path as redirect
+                            const currentPath = window.location.pathname;
+                            console.log('No user signed in, redirecting to login');
+                            console.log('Current path:', currentPath);
+                            window.location.href = `auth/login-fixed.html?redirect=${encodeURIComponent(currentPath)}`;
+                            resolve(false);
+                            return;
+                        }
+                        
+                        // Check if user is a teacher
+                        console.log('=== DEBUG: STARTING USER VERIFICATION ===');
+                        console.log('1. User UID:', user.uid);
+                        console.log('2. User email:', user.email);
+                        
+                        try {
+                            // First, check the users collection
+                            console.log('3. Checking users collection for document with ID:', user.uid);
+                            const userDocRef = doc(db, 'users', user.uid);
+                            const userDoc = await getDoc(userDocRef);
+                            
+                            if (userDoc.exists()) {
+                                const userData = userDoc.data();
+                                console.log('4. User document found:', userData);
+                                console.log('5. User type in document:', userData.userType || 'not specified');
+                                
+                                // Check if user is a teacher in the users collection
+                                if (userData.userType === 'teacher') {
+                                    console.log('6. User is a teacher according to users collection');
+                                    
+                                    // Proceed with user data from users collection
+                                    currentUser = {
+                                        uid: user.uid,
+                                        email: user.email,
+                                        ...userData,
+                                        userType: 'teacher' // Ensure userType is set
+                                    };
+                                    
+                                    console.log('7. Current user data:', currentUser);
+                                    
+                                    // Try to get teacher document, but don't fail if we can't
+                                    try {
+                                        console.log('8. Attempting to fetch teacher document...');
+                                        const teacherDocRef = doc(db, 'teachers', user.uid);
+                                        const teacherDoc = await getDoc(teacherDocRef);
+                                        
+                                        if (teacherDoc.exists()) {
+                                            console.log('9. Teacher document found, merging data');
+                                            const teacherData = teacherDoc.data();
+                                            currentUser = {
+                                                ...currentUser,
+                                                ...teacherData
+                                            };
+                                        } else {
+                                            console.log('9. No teacher document found, using basic teacher profile');
+                                        }
+                                    } catch (teacherDocError) {
+                                        console.warn('Warning: Could not access teacher document:', teacherDocError);
+                                        console.warn('Proceeding with basic teacher profile...');
+                                    }
+                                    
+                                    // Update UI for logged-in user
+                                    updateUserUI(currentUser);
+                                    
+                                    // Initialize test creator
+                                    console.log('10. Initializing test creator...');
+                                    initTestCreator();
+                                    
+                                    resolve(true);
+                                    return;
+                                } else {
+                                    console.error('6. User is not a teacher. User type in document:', userData.userType || 'not specified');
+                                    console.error('7. Redirecting to student dashboard...');
+                                    // Redirect non-teachers to the student dashboard
+                                    window.location.href = 'student-dashboard-clean.html';
+                                    resolve(false);
+                                    return;
+                                }
+                            } else {
+                                console.error('4. User document does not exist in users collection');
+                                console.error('5. Redirecting to login with error...');
+                                // If no user document exists, redirect to login
+                                window.location.href = 'auth/login-fixed.html?error=user_not_found';
+                                resolve(false);
+                                return;
+                            }
+                        } catch (error) {
+                            console.error('Error during user verification:', error);
+                            console.error('Error details:', {
+                                name: error.name,
+                                message: error.message,
+                                code: error.code,
+                                stack: error.stack
+                            });
+                            
+                            // If we have a permission error but we know the user is a teacher, proceed anyway
+                            if (error.code === 'permission-denied' && currentUser?.userType === 'teacher') {
+                                console.warn('Permission denied but user is a teacher, proceeding with limited access...');
+                                updateUserUI(currentUser);
+                                initTestCreator();
+                                resolve(true);
+                                return;
+                            }
+                            
+                            // For other errors, redirect to login
+                            window.location.href = 'auth/login-fixed.html?error=auth_error';
+                            resolve(false);
+                            return;
+                        }
+                    } catch (error) {
+                        console.error('Error in auth state change handler:', error);
+                        showNotification('Error initializing application. Please refresh the page.', 'error');
+                        resolve(false);
+                        return;
+                    }
+                });
+                
+                // Set a timeout to ensure we don't wait forever
+                setTimeout(() => {
+                    if (!auth.currentUser) {
+                        console.log('Auth check timed out, redirecting to login...');
+                        window.location.href = 'auth/login-fixed.html?redirect=' + encodeURIComponent(window.location.pathname);
+                        resolve(false);
+                    }
+                }, 3000);
+                
+                // Return cleanup function
+                return () => unsubscribe();
+            });
         }
         
         function initTestCreator() {
@@ -527,17 +639,6 @@
             console.log('Test creator initialization complete');
         }
         
-        // Function to log auth state
-        function logAuthState(user) {
-            console.log('Auth State Changed:', user ? 'User is signed in' : 'No user signed in');
-            if (user) {
-                console.log('User UID:', user.uid);
-                console.log('Email:', user.email);
-                console.log('Email Verified:', user.emailVerified);
-                console.log('Auth Persistence:', auth.currentUser ? 'User exists in auth' : 'No user in auth');
-            }
-        }
-
         // State
         let sectionCount = 0;
         let itemCount = 0;
@@ -1000,7 +1101,7 @@
                         version: '1.0.0',
                         
                         // User information
-                        createdBy: user.uid,
+                        teacherId: user.uid, // Changed from createdBy to teacherId
                         createdByEmail: userEmail,
                         createdByName: userName,
                         userType: userType,
@@ -1126,7 +1227,7 @@
                     grade: document.getElementById('test-grade')?.value || '',
                     subject: document.getElementById('test-subject')?.value || 'Reading',
                     sections: [],
-                    createdBy: localStorage.getItem('userType') || 'teacher',
+                    teacherId: localStorage.getItem('userType') || 'teacher', // Changed from createdBy to teacherId
                     // Note: We'll let Firestore handle the timestamps when saving
                 };
                 

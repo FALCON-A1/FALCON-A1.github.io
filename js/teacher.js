@@ -48,7 +48,7 @@ function loadUserData() {
             loadTeacherData(user.uid);
         } else {
             // Redirect to login if not authenticated
-            window.location.href = 'login.html';
+            window.location.href = '/auth/login-fixed.html';
         }
     });
 }
@@ -696,7 +696,7 @@ function deleteAccount() {
         })
         .then(() => {
             // Redirect to login page
-            window.location.href = 'login.html';
+            window.location.href = '/auth/login-fixed.html';
         })
         .catch(error => {
             console.error('Error deleting account:', error);

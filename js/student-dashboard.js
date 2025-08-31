@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Check authentication and role
         const user = await checkAuth();
         if (!user) {
-            window.location.href = '/login.html';
+            window.location.href = '/auth/login-fixed.html';
             return;
         }
 
@@ -523,7 +523,7 @@ function setupEventListeners() {
             e.preventDefault();
             try {
                 await window.alphariaFirebase.signOut(window.alphariaFirebase.auth);
-                window.location.href = '/login.html';
+                window.location.href = '/auth/login-fixed.html';
             } catch (error) {
                 console.error('Error signing out:', error);
                 showError('Failed to sign out. Please try again.');
