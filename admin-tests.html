@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Tests - Alpharia Admin</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <style>
+        .test-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 100%;
+        }
+        .test-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .test-card .card-body {
+            padding: 1.25rem;
+        }
+        .test-card .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+        .test-meta {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 1rem;
+        }
+        .test-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #edf2f7;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+        .badge-status {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+        }
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .search-box {
+            max-width: 300px;
+            margin-bottom: 1.5rem;
+        }
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body class="admin-dashboard">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2>Alpharia <span class="admin-badge">Admin</span></h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="menu-title">Main Menu</div>
+                
+                <div class="nav-item">
+                    <a href="admin-dashboard.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="admin-management.html" class="nav-link">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Management</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="admin-tests.html" class="nav-link active">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>All Tests</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="admin-create-test.html" class="nav-link">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Create Test</span>
+                    </a>
+                </div>
+                
+                <div class="menu-title mt-4">Analytics</div>
+                
+                <div class="nav-item">
+                    <a href="admin-reports.html" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </div>
+                
+                <div class="menu-title mt-4">Account</div>
+                
+                <div class="nav-item">
+                    <a href="admin-settings.html" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="help.html" class="nav-link">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help & Support</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=4a6cf7&color=fff" alt="User" class="user-avatar" id="user-avatar-sidebar">
+                    <div class="user-info">
+                        <h4 class="user-name" id="sidebar-admin-name">Loading...</h4>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                    <button class="sign-out" id="logout-btn" title="Sign Out">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2>All Tests</h2>
+                </div>
+                
+                <div class="top-bar-right">
+                    <div class="user-menu" id="user-menu">
+                        <button class="user-menu-button" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="user-info">
+                                <span class="user-name" id="user-name">Admin</span>
+                                <span class="user-role">Administrator</span>
+                            </div>
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </button>
+                        
+                        <div class="dropdown-menu" id="user-dropdown" aria-labelledby="user-menu-button" style="min-width: 180px; padding: 4px 0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border: 1px solid rgba(0, 0, 0, 0.05);">
+                            <a href="admin-settings.html" class="dropdown-item" style="padding: 8px 16px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-user-cog" style="width: 20px; text-align: center;"></i>
+                                <span>Settings</span>
+                            </a>
+                            <div class="dropdown-divider" style="margin: 4px 0; height: 1px; background-color: #f0f0f0;"></div>
+                            <a href="#" class="dropdown-item text-danger" id="logout-button" style="padding: 8px 16px; font-size: 14px; display: flex; align-items: center; gap: 8px; color: #dc3545;">
+                                <i class="fas fa-sign-out-alt" style="width: 20px; text-align: center;"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <div class="dashboard-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="mb-0">Test Management</h3>
+                    <a href="admin-create-test.html" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create New Test
+                    </a>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                        <input type="text" class="form-control" id="searchInput" placeholder="Search tests...">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="filters">
+                                    <div class="filter-group">
+                                        <label class="form-label small text-muted mb-1">Status</label>
+                                        <select class="form-select form-select-sm" id="statusFilter">
+                                            <option value="">All Statuses</option>
+                                            <option value="draft">Draft</option>
+                                            <option value="published">Published</option>
+                                            <option value="archived">Archived</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="form-label small text-muted mb-1">Sort By</label>
+                                        <select class="form-select form-select-sm" id="sortBy">
+                                            <option value="newest">Newest First</option>
+                                            <option value="oldest">Oldest First</option>
+                                            <option value="name_asc">Name (A-Z)</option>
+                                            <option value="name_desc">Name (Z-A)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tests Grid -->
+                <div class="row" id="testsContainer">
+                    <!-- Test cards will be dynamically inserted here -->
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading tests...</p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Test pagination" class="mt-4">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Pagination will be dynamically inserted here -->
+                    </ul>
+                </nav>
+            </div>
+        </main>
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
+        import { 
+            getAuth, 
+            signOut, 
+            onAuthStateChanged,
+            setPersistence,
+            browserLocalPersistence
+        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
+        import { 
+            getFirestore, 
+            collection, 
+            getDocs, 
+            query, 
+            orderBy,
+            where,
+            limit,
+            startAfter,
+            doc,
+            getDoc,
+            updateDoc
+        } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtOedXLBC4eigzqmBpYFciN-W5Mi2Cpmc",
+            authDomain: "alpharia-c6a39.firebaseapp.com",
+            projectId: "alpharia-c6a39",
+            storageBucket: "alpharia-c6a39.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456",
+            measurementId: "G-KEC7MGMVE8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig, 'admin-tests');
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Set persistence to LOCAL to maintain session
+        let isInitialized = false;
+        
+        try {
+            await setPersistence(auth, browserLocalPersistence);
+            console.log('Persistence set to LOCAL');
+            
+            // Check if user is already signed in
+            onAuthStateChanged(auth, (user) => {
+                if (!isInitialized) {
+                    isInitialized = true;
+                    if (!user) {
+                        console.log('No user found, redirecting to login');
+                        window.location.href = 'auth/login-fixed.html';
+                    } else {
+                        console.log('User is signed in:', user.email);
+                        initApp();
+                    }
+                }
+            });
+            
+        } catch (error) {
+            console.error('Error initializing auth:', error);
+            // If there's an error with persistence, still try to initialize
+            if (!isInitialized) {
+                isInitialized = true;
+                initApp();
+            }
+        }
+
+        // DOM Elements
+        const testsContainer = document.getElementById('testsContainer');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const sortBy = document.getElementById('sortBy');
+        const pagination = document.getElementById('pagination');
+        const logoutButton = document.getElementById('logout-button');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        // Pagination
+        const itemsPerPage = 12;
+        let currentPage = 1;
+        let lastVisible = null;
+        let hasMore = true;
+        let currentFilter = {};
+        let searchTerm = '';
+
+        // Initialize the app
+        function initApp() {
+            console.log('Initializing app...');
+            initAuthState();
+            initEventListeners();
+            loadTests();
+        }
+
+        // Start initialization when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, starting initialization...');
+            // The rest of the initialization is handled by the auth state change listener
+        });
+
+        // Initialize authentication state
+        function initAuthState() {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in
+                    document.getElementById('user-name').textContent = user.displayName || 'Admin';
+                    document.getElementById('sidebar-admin-name').textContent = user.displayName || 'Admin';
+                } else {
+                    // User is signed out, redirect to login
+                    window.location.href = 'auth/login-fixed.html';
+                }
+            });
+        }
+
+        // Initialize event listeners
+        function initEventListeners() {
+            // Logout
+            if (logoutButton) {
+                logoutButton.addEventListener('click', handleLogout);
+            }
+
+            // Search input
+            let searchTimeout;
+            searchInput?.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTerm = e.target.value.trim().toLowerCase();
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1;
+                    lastVisible = null;
+                    loadTests();
+                }, 500);
+            });
+
+            // Filters
+            statusFilter?.addEventListener('change', handleFilterChange);
+            sortBy?.addEventListener('change', handleFilterChange);
+
+            // Sidebar toggle
+            sidebarToggle?.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            });
+
+            // Check for saved sidebar state
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+            }
+        }
+
+        // Handle filter changes
+        function handleFilterChange() {
+            currentPage = 1;
+            lastVisible = null;
+            loadTests();
+        }
+
+        // Load tests from Firestore
+        async function loadTests() {
+            try {
+                testsContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading tests...</p>
+                    </div>`;
+
+                const status = statusFilter?.value || '';
+                const sortField = sortBy?.value || 'newest';
+                
+                // Build the query
+                let testsQuery = collection(db, 'tests');
+                let queryConstraints = [];
+
+                // Apply status filter
+                if (status) {
+                    queryConstraints.push(where('status', '==', status));
+                }
+
+                // Apply search term
+                if (searchTerm) {
+                    // This is a simple search - for production, consider using Algolia or similar
+                    // for better full-text search capabilities
+                    console.log('Search term:', searchTerm);
+                    // We'll filter after fetching for this example
+                }
+
+                // Apply sorting
+                switch (sortField) {
+                    case 'newest':
+                        queryConstraints.push(orderBy('createdAt', 'desc'));
+                        break;
+                    case 'oldest':
+                        queryConstraints.push(orderBy('createdAt', 'asc'));
+                        break;
+                    case 'name_asc':
+                        queryConstraints.push(orderBy('title', 'asc'));
+                        break;
+                    case 'name_desc':
+                        queryConstraints.push(orderBy('title', 'desc'));
+                        break;
+                }
+
+                // Add pagination
+                queryConstraints.push(limit(itemsPerPage));
+                if (lastVisible && currentPage > 1) {
+                    queryConstraints.push(startAfter(lastVisible));
+                }
+
+                // Execute the query
+                const q = query(testsQuery, ...queryConstraints);
+                const querySnapshot = await getDocs(q);
+                
+                // Process results
+                const tests = [];
+                querySnapshot.forEach((doc) => {
+                    tests.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Update last visible for pagination
+                if (querySnapshot.docs.length > 0) {
+                    lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+                    hasMore = querySnapshot.docs.length === itemsPerPage;
+                } else {
+                    hasMore = false;
+                }
+
+                // Apply search filter if needed
+                const filteredTests = searchTerm 
+                    ? tests.filter(test => 
+                        test.title.toLowerCase().includes(searchTerm) || 
+                        (test.description && test.description.toLowerCase().includes(searchTerm))
+                    )
+                    : tests;
+
+                // Render tests
+                renderTests(filteredTests);
+                renderPagination();
+
+            } catch (error) {
+                console.error('Error loading tests:', error);
+                testsContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Error loading tests. Please try again later.
+                        </div>
+                    </div>`;
+            }
+        }
+
+        // Render tests in the UI
+        function renderTests(tests) {
+            if (tests.length === 0) {
+                testsContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No tests found. Create your first test to get started.
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            testsContainer.innerHTML = tests.map(test => `
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+                    <div class="card test-card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title text-truncate" title="${test.title}">${test.title}</h5>
+                                <span class="badge ${getStatusBadgeClass(test.status)}">${test.status || 'draft'}</span>
+                            </div>
+                            
+                            ${test.description ? `<p class="small text-muted mb-3">${test.description.substring(0, 100)}${test.description.length > 100 ? '...' : ''}</p>` : ''}
+                            
+                            <div class="test-meta">
+                                <div class="mb-1">
+                                    <i class="far fa-calendar-alt me-2"></i>
+                                    Created: ${test.createdAt ? new Date(test.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}
+                                </div>
+                                <div>
+                                    <i class="far fa-user me-2"></i>
+                                    Created by: ${test.createdByName || 'Unknown'}
+                                </div>
+                            </div>
+                            
+                            <div class="test-stats mt-auto">
+                                <div class="stat-item">
+                                    <i class="far fa-list-alt"></i>
+                                    ${test.sections ? test.sections.length : 0} sections
+                                </div>
+                                <div class="stat-item">
+                                    <i class="far fa-question-circle"></i>
+                                    ${test.totalQuestions || 0} questions
+                                </div>
+                            </div>
+                            
+                            <div class="actions mt-3">
+                                <a href="test-details.html?id=${test.id}" class="btn btn-sm btn-outline-primary">
+                                    <i class="far fa-eye"></i> View
+                                </a>
+                                <a href="admin-edit-test.html?id=${test.id}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="far fa-edit"></i> Edit
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger ms-auto" onclick="confirmDelete('${test.id}')">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get badge class based on test status
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'published':
+                    return 'bg-success';
+                case 'draft':
+                    return 'bg-secondary';
+                case 'archived':
+                    return 'bg-warning text-dark';
+                default:
+                    return 'bg-secondary';
+            }
+        }
+
+        // Render pagination
+        function renderPagination() {
+            // For simplicity, we're using a basic pagination
+            // In a real app, you'd calculate the total number of pages
+            pagination.innerHTML = `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" ${currentPage === 1 ? 'tabindex="-1" aria-disabled="true"' : ''} data-page="${currentPage - 1}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                <li class="page-item ${!hasMore ? 'disabled' : ''}">
+                    <a class="page-link" href="#" ${!hasMore ? 'tabindex="-1" aria-disabled="true"' : ''} data-page="${currentPage + 1}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>`;
+
+            // Add event listeners to pagination buttons
+            document.querySelectorAll('.page-link[data-page]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = parseInt(link.getAttribute('data-page'));
+                    if (page !== currentPage) {
+                        currentPage = page;
+                        loadTests();
+                    }
+                });
+            });
+        }
+
+        // Handle logout
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error signing out:', error);
+                alert('Error signing out. Please try again.');
+            }
+        }
+
+        // Make confirmDelete available globally
+        window.confirmDelete = function(testId) {
+            if (confirm('Are you sure you want to delete this test? This action cannot be undone.')) {
+                // In a real app, you would delete the test from Firestore here
+                alert('Test deletion would be processed here. In a real app, this would delete the test from the database.');
+                // Example: deleteTest(testId);
+            }
+        };
+    </script>
+</body>
+</html>

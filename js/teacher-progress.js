@@ -359,17 +359,20 @@ async function loadClassData(teacherId) {
             
             processedStudents++;
             
-            // Update UI after each student is processed
+            // Update dashboard stats periodically during loading
             if (processedStudents % 5 === 0 || processedStudents === totalStudents) {
                 updateDashboardStats(totalStudents, totalScore, processedStudents, totalAssignments);
-                updateStudentTable(studentData);
             }
         }
         
-        // Update the UI with the calculated data
+        // Final UI update with all data
         updateDashboardStats(totalStudents, totalScore, studentData.length, totalAssignments);
-        updateStudentTable(studentData);
-        updateCharts(studentData);
+        
+        // Only update the table once with the complete data
+        if (studentData.length > 0) {
+            updateStudentTable(studentData);
+            updateCharts(studentData);
+        }
         
     } catch (error) {
         console.error('Error loading class data:', error);
@@ -410,28 +413,177 @@ function updateDashboardStats(totalStudents, totalScore, numStudents, totalAssig
         else if (avgScore >= 60) grade = 'D';
         else grade = 'F';
         
-        classAverageElement.textContent = grade;
+        classAverageElement.textContent = `${avgScore}% (${grade})`;
     }
 }
 
+// Track the DataTable instance
+let studentDataTable = null;
+
 // Update the student progress table
 function updateStudentTable(students) {
-    try {
-        console.log('Updating student table with data:', students);
-        
-        // Only proceed if we're on the teacher progress page
-        if (!window.location.pathname.includes('teacher-progress.html')) {
-            console.log('Not on teacher progress page, skipping table update');
+    // Only proceed if we're on the teacher progress page
+    const isProgressPage = document.querySelector('body.teacher-progress-page') || 
+                         window.location.pathname.includes('teacher-progress');
+    
+    if (!isProgressPage) {
+        console.log('Not on teacher progress page, skipping table update');
+        return;
+    }
+    
+    const table = document.querySelector('#studentProgressTable');
+    if (!table) {
+        console.error('Student progress table not found in DOM');
+        return;
+    }
+    
+    console.log('Updating student table with data for', students.length, 'students');
+    
+    // If DataTable is already initialized, just update the data
+    if (studentDataTable && $.fn.DataTable && $.fn.DataTable.isDataTable('#studentProgressTable')) {
+        try {
+            console.log('Updating existing DataTable with new data');
+            studentDataTable.clear().rows.add(students).draw();
             return;
+        } catch (e) {
+            console.error('Error updating DataTable, will reinitialize:', e);
+            studentDataTable.destroy(true);
+            studentDataTable = null;
+        }
+    }
+    
+    // Get the table body
+    const tbody = table.querySelector('tbody');
+    if (!tbody) {
+        console.error('Table body not found in student progress table');
+        return;
+    }
+    
+    // Clear any existing rows
+    tbody.innerHTML = '';
+    
+    // If no students, show a message
+    if (!students || students.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="7" class="text-center py-4">
+                <div class="d-flex flex-column align-items-center">
+                    <i class="fas fa-users-slash fa-2x text-muted mb-2"></i>
+                    <p class="mb-0">No students found in your class</p>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+        return;
+    }
+    
+    // Sort students by average score (descending)
+    const sortedStudents = [...students].sort((a, b) => (b.averageScore || 0) - (a.averageScore || 0));
+    
+    // Add student rows
+    sortedStudents.forEach((student, index) => {
+        console.log(`Processing student ${index + 1}/${sortedStudents.length}:`, student);
+        
+        const row = document.createElement('tr');
+        
+        // Format the last test date
+        let lastTestText = 'N/A';
+        if (student.lastTest) {
+            try {
+                const date = student.lastTest.toDate ? student.lastTest.toDate() : new Date(student.lastTest);
+                lastTestText = date.toLocaleDateString();
+            } catch (e) {
+                console.warn('Error formatting date:', e);
+            }
         }
         
-        // Find the student progress table
-        const table = document.querySelector('#studentProgressTable');
-        if (!table) {
-            console.error('Student progress table not found');
-            return;
-        }
+        // Calculate progress percentage
+        const progress = student.averageScore || 0;
+        const status = progress >= 70 ? 'Active' : 'Needs Help';
+        const statusClass = status === 'Active' ? 'success' : 'warning';
         
+        row.innerHTML = `
+            <td>${student.name || 'N/A'}</td>
+            <td>${lastTestText}</td>
+            <td>${student.averageScore || 0}%</td>
+            <td>${student.testsCompleted || 0}</td>
+            <td>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-primary" role="progressbar" 
+                         style="width: ${progress}%" 
+                         aria-valuenow="${progress}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                    </div>
+                </div>
+                <small class="text-muted">${progress}%</small>
+            </td>
+            <td><span class="badge bg-${statusClass}">${status}</span></td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary view-student" data-id="${student.id}">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#studentDetailsModal">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    // Initialize DataTables if available
+    if (typeof $.fn.DataTable === 'function') {
+        try {
+            console.log('Initializing DataTable with', students.length, 'students');
+            
+            // Destroy any existing instance first
+            if ($.fn.DataTable.isDataTable('#studentProgressTable')) {
+                $('#studentProgressTable').DataTable().destroy(true);
+            }
+            
+            // Initialize DataTable with proper configuration
+            studentDataTable = $('#studentProgressTable').DataTable({
+                    pageLength: 10,
+                    order: [[2, 'desc']], // Sort by average score by default
+                    responsive: true,
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search students...",
+                        emptyTable: "No student data available"
+                    },
+                    dom: '<"d-flex justify-content-between align-items-center mb-3"f<"ms-3"l>>rtip',
+                    initComplete: function() {
+                        $('.dataTables_filter input').addClass('form-control');
+                        console.log('DataTable initialization complete');
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: [5, 6] }, // Make action buttons not sortable
+                        { responsivePriority: 1, targets: 0 }, // Student name
+                        { responsivePriority: 2, targets: 2 }, // Average score
+                        { responsivePriority: 3, targets: 3 }, // Completed tests
+                        { responsivePriority: 4, targets: 4 }, // Progress
+                        { responsivePriority: 5, targets: 1 }, // Last active
+                        { responsivePriority: 6, targets: 5 }, // Status
+                        { responsivePriority: 7, targets: 6 }  // Actions
+                    ]
+                });
+                
+                console.log('DataTable initialized successfully');
+                
+            } catch (error) {
+                console.error('Error initializing DataTable:', error);
+                // Clean up if initialization fails
+                if ($.fn.DataTable.isDataTable('#studentProgressTable')) {
+                    $('#studentProgressTable').DataTable().destroy(true);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error in updateStudentTable:', error);
+    }
         // Get the table body
         const tbody = table.querySelector('tbody');
         if (!tbody) {
@@ -555,66 +707,116 @@ function updateStudentTable(students) {
         
         // Initialize DataTables if available
         if (typeof $.fn.DataTable === 'function') {
-            // Make sure we're still on the right page
-            if (!window.location.pathname.includes('teacher-progress.html')) {
-                console.log('Page changed, skipping DataTable initialization');
-                return;
-            }
-            
-            // Find the main student progress table (not the one in modals)
-            const table = $('#studentProgressTable');
-            
-            if (table.length) {
-                console.log('Initializing DataTable on:', table[0]);
+            try {
+                console.log('Initializing DataTable with', students.length, 'students');
                 
-                // Check if DataTable is already initialized
-                if ($.fn.DataTable.isDataTable(table)) {
-                    try {
-                        console.log('Destroying existing DataTable instance');
-                        table.DataTable().destroy(true);
-                    } catch (e) {
-                        console.error('Error destroying existing DataTable:', e);
-                    }
+                // Destroy any existing instance first
+                if ($.fn.DataTable.isDataTable('#studentProgressTable')) {
+                    $('#studentProgressTable').DataTable().destroy(true);
                 }
                 
-                try {
-                    console.log('Initializing new DataTable instance');
-                    
-                    // Initialize with proper configuration
-                    const dataTable = table.DataTable({
-                        pageLength: 10,
-                        order: [[2, 'desc']], // Sort by average score by default
-                        responsive: true,
-                        language: {
-                            search: "_INPUT_",
-                            searchPlaceholder: "Search students...",
-                            emptyTable: "No student data available"
+                // Initialize with proper configuration
+                studentDataTable = $('#studentProgressTable').DataTable({
+                    data: students,
+                    columns: [
+                        { data: 'name' },
+                        { 
+                            data: 'lastActive',
+                            render: function(data, type, row) {
+                                return data || 'N/A';
+                            }
                         },
-                        dom: '<"d-flex justify-content-between align-items-center mb-3"f<"ms-3"l>>rtip',
-                        initComplete: function() {
-                            $('.dataTables_filter input').addClass('form-control');
-                            console.log('DataTable initialization complete');
+                        { 
+                            data: 'averageScore',
+                            render: function(data, type, row) {
+                                return data !== undefined ? data + '%' : 'N/A';
+                            }
                         },
-                        columnDefs: [
-                            { orderable: false, targets: [5, 6] }, // Make action buttons not sortable
-                            { responsivePriority: 1, targets: 0 }, // Student name
-                            { responsivePriority: 2, targets: 2 }, // Average score
-                            { responsivePriority: 3, targets: 3 }, // Completed tests
-                            { responsivePriority: 4, targets: 4 }, // Progress
-                            { responsivePriority: 5, targets: 1 }, // Last active
-                            { responsivePriority: 6, targets: 5 }, // Status
-                            { responsivePriority: 7, targets: 6 }  // Actions
-                        ]
-                    });
-                    
-                    console.log('DataTable initialized successfully');
-                    
-                } catch (error) {
-                    console.error('Error initializing DataTable:', error);
+                        { data: 'testsCompleted' },
+                        { 
+                            data: 'progress',
+                            render: function(data, type, row) {
+                                return `
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" 
+                                             style="width: ${data || 0}%" 
+                                             aria-valuenow="${data || 0}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">${data || 0}%</small>
+                                `;
+                            }
+                        },
+                        { 
+                            data: 'status',
+                            render: function(data, type, row) {
+                                const statusClass = data === 'Active' ? 'success' : 'secondary';
+                                return `<span class="badge bg-${statusClass}">${data}</span>`;
+                            }
+                        },
+                        {
+                            data: null,
+                            render: function(data, type, row) {
+                                return `
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-primary view-student" data-id="${row.id}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#studentDetailsModal">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                        }
+                    ],
+                    pageLength: 10,
+                    order: [[2, 'desc']], // Sort by average score by default
+                    responsive: true,
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search students...",
+                        emptyTable: "No student data available"
+                    },
+                    dom: '<"d-flex justify-content-between align-items-center mb-3"f<"ms-3"l>>rtip',
+                    initComplete: function() {
+                        $('.dataTables_filter input').addClass('form-control');
+                        console.log('DataTable initialization complete');
+                    },
+                    drawCallback: function() {
+                        // Add any post-draw operations here
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: [5, 6] }, // Make action buttons not sortable
+                        { responsivePriority: 1, targets: 0 }, // Student name
+                        { responsivePriority: 2, targets: 2 }, // Average score
+                        { responsivePriority: 3, targets: 3 }, // Completed tests
+                        { responsivePriority: 4, targets: 4 }, // Progress
+                        { responsivePriority: 5, targets: 1 }, // Last active
+                        { responsivePriority: 6, targets: 5 }, // Status
+                        { responsivePriority: 7, targets: 6 }  // Actions
+                    ]
+                });
+                
+                console.log('DataTable initialized successfully');
+                isTableInitializing = false;
+                
+            } catch (error) {
+                console.error('Error initializing DataTable:', error);
+                isTableInitializing = false;
+                
                 }
-            } else {
-                console.error('Student progress table not found for DataTables initialization');
             }
+        }, 50);
+        
+        document.getElementById('noStudentsRow');
+        if (noStudentsRow) {
+            noStudentsRow.querySelector('p').textContent = 'Error loading student data';
+            noStudentsRow.querySelector('.spinner-border').style.display = 'none';
+            noStudentsRow.style.display = 'table-row';
+            document.querySelector('#studentTableBody').appendChild(noStudentsRow);
         }
     } catch (error) {
         console.error('Error in updateStudentTable:', error);
